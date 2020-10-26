@@ -43,7 +43,7 @@ Gomoku, also called Five in a Row, is an abstract strategy, 2 players board game
   - ***Game Board / Result Page***
   - ***Chat Box***
   
-[Details]()
+[Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/componentsDetails.md)
 
 # Graphic User Interface
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI_design.jpg" width="650"> <br>
