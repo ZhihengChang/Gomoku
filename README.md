@@ -28,14 +28,28 @@ Gomoku, also called Five in a Row, is an abstract strategy, 2 players board game
 - If the player click on ```Surrender```, the opponent will win the game and derict to End Game result page (5). 
 - If one of the players have 5 pieces in a line, the player will win, game ends and derict to End Game result page (5). 
 #### **5. End Game** 
+- The End Game result page tells the match information to players.
+- Match information contains: the winner, the game length, total pieces, rewards, etc.
+- The player can view the Go Board by clicking ```View Board``` button at the bottom of the page.
+- The player can go back to the Home page by clicking ```OK``` button at the bottom of the page (2).
 
+# Components
+- ***Login Page***
+- ***Home Page***
+  - ***Game List / Waiting Room Page***
+  - ***Menu Bar***
+- ***Game Page***
+  - ***Menu Bar***
+  - ***Game Board / Result Page***
+  - ***Chat Box***
+  
+[Details]()
 
 # Graphic User Interface
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI_design.jpg" width="650"> <br>
 #### A: Menu Bar (Tool Bar)
 - Regret Last Step
 - Surrender
-- spectate
 - setting
 #### B: Game Board (Go Board)
 The area to place Go pieces 
@@ -49,8 +63,9 @@ custom chessboard size
 can change piece's color <br>
 sound effects when placing pieces <br>
 #### Game Features:
+Player Profile System <br>
+Friends <br>
 Regret Last Step game mode <br>
 Allow player to spectate others <br>
 chat box (run with the game Simultaneous）<br>
 
-a
