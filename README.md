@@ -5,10 +5,10 @@ For detailed process: [Process Details](https://github.com/ZhihengChang/Gomoku/b
 #### **1. Login** <br>
 Require Player's username and password. Upon successful login, proceed to Home Page. <br>
 Forgot Username and Password is supported. <br><br>&nbsp;
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/loginUI.png" style="" width="300"> <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/loginUI.png" style="" width="300"> <br>
 #### **2. Home page** 
 Player can joins/creates/spectates games in this page. If any action above is taken, proceed to Waiting Room Page. <br><br>
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/homePageUI.png" width="600"> <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homePageUI.png" width="600"> <br>
 #### **3. Waiting Room Page** 
 Pre game page, waiting for game starts. When the game starts, proceed to In Game Page
 #### **4. In Game** 
