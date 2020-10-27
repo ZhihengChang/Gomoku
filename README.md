@@ -5,7 +5,8 @@ For detailed process: [Process Details](https://github.com/ZhihengChang/Gomoku/b
 For detailed program flow: [flow Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/flowDetails.md)
 #### **1. Login** <br>
 Require Player's username and password. Upon successful login, proceed to Home Page. <br>
-Forgot Username and Password is supported. <br><br>&nbsp;
+Forgot Username and Password is supported. By clicking on these two option, the user will be proceed to Account Recovery process. <br>
+By default, the user will have total of 5 login attempts. If exceeds attempts limit, proceed to Account Recovery automatically <br><br>&nbsp;
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/loginUI.png" style="" width="300"> <br>
 #### **2. Home page** 
 Player can joins/creates/spectates games in this page. If any action above is taken, proceed to Waiting Room Page. <br><br>
