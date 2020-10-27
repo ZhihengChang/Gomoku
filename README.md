@@ -1,7 +1,8 @@
 # Gomoku
 Gomoku, also called Five in a Row, is an abstract strategy, 2 players board game. <br>
 # General Process and Basic UI
-For detailed process: [Process Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/processDetails.md)
+For detailed process: [Process Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/processDetails.md) <br>
+For detailed program flow: [flow Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/flowDetails.md)
 #### **1. Login** <br>
 Require Player's username and password. Upon successful login, proceed to Home Page. <br>
 Forgot Username and Password is supported. <br><br>&nbsp;
