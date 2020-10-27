@@ -20,8 +20,8 @@ Each componet is followed by a tag within a parentheses(eg: info, button, etc). 
         - Allow RLS (Regret Last Step) 
         - Allow Chat 
         - Board Size 
-      - Players (eg: 0/1 or 1/1) 
-      - Spectation (eg: 0/0, 4/10, etc.) 
+      - Players (e.g. 0/1 or 1/1) 
+      - Spectation (e.g. 0/0, 4/10, etc.) 
       - Join (button)
       - Spectate (button)
   - ***Waiting Room Page (In Place)***
