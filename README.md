@@ -28,16 +28,6 @@ For detailed components: [Components Details](https://github.com/ZhihengChang/Go
   - ***Game Board / Result Page***
   - ***Chat Box***
   
-# Graphic User Interface
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI_design.jpg" width="650"> <br>
-#### A: Menu Bar (Tool Bar)
-- Regret Last Step
-- Surrender
-- setting
-#### B: Game Board (Go Board)
-The area to place Go pieces 
-#### C: Chat Box
-The area to chat (send and recieve messages) with opponents
 # Game Rule
 Player who get 5 pieces in line win the game (horizontally or vertically or diagonally) <br>
 # Features
