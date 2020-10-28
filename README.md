@@ -5,17 +5,34 @@ For detailed process: [Process Details](https://github.com/ZhihengChang/Gomoku/b
 For detailed program flow: [flow Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/flowDetails.md)
 #### **1. Login** <br>
 Require Player's username and password. Upon successful login, proceed to Home Page. <br>
-Forgot Username and Password is supported. By clicking on these two option, the user will be proceed to Account Recovery process. <br>
-By default, the user will have total of 5 login attempts. If exceeds attempts limit, proceed to Account Recovery automatically <br><br>&nbsp;
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/loginUI.png" style="" width="300"> <br>
-#### **2. Home page** 
-Player can joins/creates/spectates games in this page. If any action above is taken, proceed to Waiting Room Page. <br><br>
+Forgot Username and Password is supported. By clicking on these two option, the user will be proceed to Account Recovery process.
+By default, the user will have total of 5 login attempts. If exceeds attempts limit, proceed to Account Recovery automatically.
+
+#### **2. Home** 
+The player can joins/creates/spectates games in this page. <br>
+If the player clicks on ```Create``` button to create a game, proceed to step 3. <br>
+Otherwise, for ```Join``` and ```Spectate```, proceed to the Waiting Room (step 4).
+<br><br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homePageUI.png" width="600"> <br>
-#### **3. Waiting Room Page** 
-Pre game page, waiting for game starts. When the game starts, proceed to In Game Page
-#### **4. In Game** 
+
+#### **3. Creating Game** 
+The player can set game settings in this step. (e.g. board size, piece's color, Allow Undo, Allow Chat, etc.) <br>
+By default, the board size is 15X15, Allow Undo is OFF, and Allow Chat is OFF. <br>
+Click ```Create``` button at the bottom of the page to create the game (step 4). <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/createGameUI.png" width="650"> <br>
+***NOTE:*** Missing Back/Cancel Button.
+
+#### **4. Waiting Room** 
+The Waiting Room shows the owner's settings of this game and players who is spectating the game. <br>
+The total queue time is also shown below the settings. <br>
+The Player can cancel the game any time when in the queue. <br>
+When another player joins the game, the game will automatically start (step 5). <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/waitingRoomUI.png" width="650"> <br>
+***NOTE:*** Missing Back/Cancel Button.
+
+#### **5. In Game** 
 The game page where both players plays the game. If one of the player won or surrendered, then proceed to End Game Page.
-#### **5. End Game** 
+#### **6. End Game** 
 The game ends and shows the result.
 
 # Components
