@@ -13,7 +13,7 @@ The player can joins/creates/spectates games in this page. <br>
 If the player clicks on ```Create``` button to create a game, proceed to step 3. <br>
 Otherwise, for ```Join``` and ```Spectate```, proceed to the Waiting Room (step 4).
 <br><br>
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homePageUI.png" width="600"> <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homeUI.png" width="650"> <br>
 
 #### 3. Creating Game
 The player can set game settings in this step. (e.g. board size, piece's color, Allow Undo, Allow Chat, etc.) <br>
