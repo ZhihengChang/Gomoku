@@ -37,7 +37,11 @@ If one of the player won, then proceed to End Game Page.<br><br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="700"> <br>
 
 #### 5. End Game
-The game ends and shows the result.
+The End Game shows which player wins <br>
+The Game status (e.g. match time, number of pieces the player placed, exp/rewards gains, etc.) is also shown in the End Game. <br>
+The player can view the game board again by clicking ```View Board``` button at the bottom of the page. <br>
+The player can go back to Home by clicking ```Quit``` or ```HOME``` button. <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/endGameUI.png" width="650"> <br>
 
 # Components
 For detailed components: [Components Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/componentsDetails.md)
