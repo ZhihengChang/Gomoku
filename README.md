@@ -14,6 +14,7 @@ If the player clicks on ```Create``` button to create a game, proceed to step 3.
 Otherwise, for ```Join``` and ```Spectate```, proceed to the Waiting Room (step 4).
 <br><br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homeUI.png" width="630"> <br>
+***NOTE:*** Add a Refresh Button. <br>
 
 #### 3. Creating Game
 The player can set game settings in this step. (e.g. board size, piece's color, Allow Undo, Allow Chat, etc.) <br>
@@ -25,7 +26,16 @@ When the game is successfully created, proceed to In Game (4) and waiting for an
 ***NOTE:*** Waiting Room is deprecated: [Waiting Room (DEPRECATED)](https://github.com/ZhihengChang/Gomoku/edit/main/doc/deprecated/waitingRoom.md). <br>
 
 #### 4. In Game
-The game page where both players plays the game. If one of the player won or surrendered, then proceed to End Game Page.
+In Game is where both players plays the game. <br>
+The player will have (by default) 60 second time limit per turn to place the piece on the board. <br>
+If the player does NOT place a piece on the board by the end of the time limit, then the opponent wins, proceeds to the End Game. <br>
+The player can Undo last step by clicking ```Undo``` when ```Allow Undo``` is ```ON``` and the opponent confirmed. <br> 
+The player can Quit the game by clicking ```Quit``` back to the Home, the opponent wins. (NO exp/rewards gain) <br>
+The player can Surrender by clicking ```Surrender```, the opponent wins, proceed to the End Game. (partial exp/rewards gain) <br>
+The player can Chat with the opponent if ```Allow Chat``` is ```ON```. <br>
+If one of the player won, then proceed to End Game Page.<br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="650"> <br>
+
 #### 5. End Game
 The game ends and shows the result.
 
