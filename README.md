@@ -30,11 +30,11 @@ In Game is where both players plays the game. <br>
 The player will have (by default) 60 second time limit per turn to place the piece on the board. <br>
 If the player does NOT place a piece on the board by the end of the time limit, then the opponent wins, proceeds to the End Game. <br>
 The player can Undo last step by clicking ```Undo``` when ```Allow Undo``` is ```ON``` and the opponent confirmed. <br> 
-The player can Quit the game by clicking ```Quit``` back to the Home, the opponent wins. (NO exp/rewards gain) <br>
-The player can Surrender by clicking ```Surrender```, the opponent wins, proceed to the End Game. (partial exp/rewards gain) <br>
+The player can Quit the game by clicking ```Quit``` back to the Home, the opponent wins (NO exp/rewards gain). <br>
+The player can Surrender by clicking ```Surrender```, the opponent wins, proceed to the End Game (PARTIAL exp/rewards gain). <br>
 The player can Chat with the opponent if ```Allow Chat``` is ```ON```. <br>
 If one of the player won, then proceed to End Game Page.<br>
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="650"> <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="700"> <br>
 
 #### 5. End Game
 The game ends and shows the result.
