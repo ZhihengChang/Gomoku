@@ -43,6 +43,20 @@ The player can view the game board again by clicking ```View Board``` button at 
 The player can go back to Home by clicking ```Quit``` or ```HOME``` button. <br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/endGameUI.png" width="650"> <br>
 
+#### 6. Miscellaneous
+Below are other sub pages that include in this program. <br>
+- Profile
+- Friends
+- Settings
+###### 6.1 Player Profile
+The Profile shows the basic info / game stat of the player. <br>
+The basic info contains: player's avatar, player's level, player ID, birthday, and personal signature. <br>
+The player info (except ID) can be changed in the Settings. <br>
+The game stat contains: player's rank, total wins, win rate, and match histories. <br>
+The player can view the game board by clicking ```View``` button on each match entry in match history. <br>
+The player can go back to previous page by clicking ```Back``` button in the Menu Bar. <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/profileUI.png" width="650"> <br>
+
 # Components
 For detailed components: [Components Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/componentsDetails.md)
 - ***Login Page***
