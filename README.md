@@ -45,10 +45,10 @@ The player can go back to Home by clicking ```Quit``` or ```HOME``` button. <br>
 
 #### 6. Miscellaneous
 Below are other sub pages that include in this program. <br>
-- Profile
-- Friends
-- Settings
-###### 6.1 Player Profile
+- **Profile:** everything about the player
+- **Friends:** player's friends list
+- **Settings:** program settings and game settings
+##### 6.1 Player Profile
 The Profile shows the basic info / game stat of the player. <br>
 The basic info contains: player's avatar, player's level, player ID, birthday, and personal signature. <br>
 The player info (except ID) can be changed in the Settings. <br>
@@ -59,14 +59,14 @@ The player can go back to previous page by clicking ```Back``` button in the Men
 
 # Components
 For detailed components: [Components Details](https://github.com/ZhihengChang/Gomoku/blob/main/doc/componentsDetails.md)
-- ***Login Page***
-- ***Home Page***
-  - ***Game List / Waiting Room Page***
-  - ***Menu Bar***
-- ***Game Page***
-  - ***Menu Bar***
-  - ***Game Board / Result Page***
-  - ***Chat Box***
+- **Login Page**
+- **Home Page**
+  - **Game List / Waiting Room Page**
+  - **Menu Bar**
+- **Game Page**
+  - **Menu Bar**
+  - **Game Board / Result Page**
+  - **Chat Box**
   
 # Game Rule
 Player who get 5 pieces in line win the game (horizontally or vertically or diagonally) <br>
