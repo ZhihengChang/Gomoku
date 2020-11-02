@@ -35,6 +35,12 @@ The player can Chat with the opponent if ```Allow Chat``` is ```ON```. <br>
 If one of the player won, then proceed to End Game Page.<br><br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="700"> <br>
 
+##### Friends Tab
+The Friends shows the player's friends list. <br>
+The player can invite friend that is currently online and NOT waiting or in game to join the game. <br>
+The player can spectate friend's match if the player is still waiting. <br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGame_friends.png" width="700"> <br>
+
 #### 5. End Game
 The End Game shows which player wins <br>
 The Game status (e.g. match time, number of pieces the player placed, exp/rewards gains, etc.) is also shown in the End Game. <br>
