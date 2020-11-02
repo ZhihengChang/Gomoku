@@ -42,7 +42,7 @@ The player can spectate friend's match if the player is still waiting. <br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGame_friends.png" width="700"> <br>
 
 ##### Spectate Tab
-The ```Spectate``` is similar to the ```Friends``` above.
+The ```Spectate``` is similar to the ```Friends``` above. <br>
 There is NO interaction buttons in this tab.
 
 #### 5. End Game
