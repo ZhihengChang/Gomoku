@@ -36,10 +36,14 @@ If one of the player won, then proceed to End Game Page.<br><br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGameUI.png" width="700"> <br>
 
 ##### Friends Tab
-The Friends shows the player's friends list. <br>
+The ```Friends``` shows the player's friends list. <br>
 The player can invite friend that is currently online and NOT waiting or in game to join the game. <br>
 The player can spectate friend's match if the player is still waiting. <br>
 <img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/inGame_friends.png" width="700"> <br>
+
+##### Spectate Tab
+The ```Spectate``` is similar to the ```Friends``` above.
+There is NO interaction buttons in this tab.
 
 #### 5. End Game
 The End Game shows which player wins <br>
