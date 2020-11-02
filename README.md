@@ -11,9 +11,8 @@ By default, the user will have total of 5 login attempts. If exceeds attempts li
 #### 2. Home
 The player can joins/creates/spectates games in this page. <br>
 If the player clicks on ```Create``` button to create a game, proceed to step 3. <br>
-Otherwise, for ```Join``` and ```Spectate```, proceed to the Waiting Room (step 4).
-<br><br>
-<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homeUI.png" width="630"> <br>
+Otherwise, for ```Join``` and ```Spectate```, proceed to the Waiting Room (step 4).<br>
+<img src="https://github.com/ZhihengChang/Gomoku/blob/main/doc/img/UI/homeUI.png" width="650"> <br>
 ***NOTE:*** Add a Refresh Button. <br>
 
 #### 3. Creating Game
