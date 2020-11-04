@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Client Utilities
  */
@@ -7,7 +8,13 @@
   * @param {HTMLElement} elem 
   * @param {object} attrs: an object contains 1 or multiple attributes
   */
-function setDomAttrs(elem, attrs){
+
+function setDomAttrs(elem, attrs, ...moreAttrs){
+
+    if(!isEmpty(moreAttrs)){
+        setDomAttrs(elem, ...moreAttrs);
+    }
+
     for(let attrName in attrs){
         switch(attrName){
             case 'class':
@@ -20,6 +27,9 @@ function setDomAttrs(elem, attrs){
                     elem.style[styleName] = styles[styleName];
                 };
                 break;
+            case 'txt':
+                elem.textContent = attrs.txt;
+                break;
             case 'hidden':
                 elem.hidden = attrs.hidden;
                 break;
@@ -27,14 +37,24 @@ function setDomAttrs(elem, attrs){
                 elem.setAttribute(attrName, attrs[attrName]);
         }
     }
+
+    return elem;
+}
+
+setDomAttrs.prototype.addAttr = function(attrs){
+    setDomAttrs(this, attrs);
 }
 
 /**
  * Create a HTMLElement specified by the given tagname and returns it
  * @param {String} tagname 
  */
-function createDom(tagname){
-    return document.createElement(tagname);
+function createDom(tagname, attrs){
+    let newElem = document.createElement(tagname);
+    if(attrs){
+        setDomAttrs(newElem, attrs);
+    } 
+    return newElem;
 }
 
 /**
@@ -48,4 +68,12 @@ function addDom(parent, ...children){
         parent.appendChild(child);
     }
     return parent;
+}
+
+function isEmpty(_obj) {
+    if( Array.isArray(_obj) && _obj.length == 0) return true;
+    if( _obj instanceof Set && _obj.size == 0) return true;
+    if( _obj instanceof Map && _obj.size == 0) return true;
+
+    return (!_obj || Object.keys(_obj).length == 0);
 }
