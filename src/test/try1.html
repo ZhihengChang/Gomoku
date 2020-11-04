@@ -9,14 +9,16 @@
     </body>
 </html>
 <script>
-    let redSquare = createDom('div');
-    setDomAttrs(redSquare,{
+    let redSquare = createDom('div', 
+    {
         style:{
             width: '100px', 
             height: '100px', 
-            backgroundColor: 'blue'
+            backgroundColor: 'red'
         }
-    }, {})
+    }, 
+    {txt: 'Hello'});
+    // setDomAttrs(redSquare,);
     addDom(document.body, redSquare);
 
 </script>

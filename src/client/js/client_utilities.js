@@ -41,18 +41,14 @@ function setDomAttrs(elem, attrs, ...moreAttrs){
     return elem;
 }
 
-setDomAttrs.prototype.addAttr = function(attrs){
-    setDomAttrs(this, attrs);
-}
-
 /**
  * Create a HTMLElement specified by the given tagname and returns it
  * @param {String} tagname 
  */
-function createDom(tagname, attrs){
+function createDom(tagname, ...attrs){
     let newElem = document.createElement(tagname);
     if(attrs){
-        setDomAttrs(newElem, attrs);
+        setDomAttrs(newElem, ...attrs);
     } 
     return newElem;
 }
