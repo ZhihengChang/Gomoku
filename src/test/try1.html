@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script src='../client/js/client_utilities.js'></script>
+        <!-- <script src='../client/js/client_utilities.js'></script> -->
     </head>
     <body>
         
 
     </body>
 </html>
-<script>
-    let redSquare = createDom('div', 
-    {
+<script type='module'>
+    import * as util from '../client/js/client_utilities.js';
+
+    let redSquare = util.createDom('div', {txt: 'Hello'});
+    util.setAttrs(redSquare, {style:{border:'solid 1px'}}).setAttrs({style:{backgroundColor: 'blue'}}).setAttrs({
         style:{
             width: '100px', 
             height: '100px', 
-            backgroundColor: 'red'
         }
-    }, 
-    {txt: 'Hello'});
-    // setDomAttrs(redSquare,);
-    addDom(document.body, redSquare);
+    });
+    util.addDom(document.body, redSquare);
 
 </script>
