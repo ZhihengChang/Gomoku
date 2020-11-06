@@ -1,0 +1,25 @@
+.main.container {
+    display: grid;
+    border: solid black 1px;
+    height: 100px;
+    width: 500px;
+    padding: 10px;
+    grid-template-columns: 20% 50% 30%;
+    grid-template-rows: 100px;
+}
+
+.avatar.container {
+    background-color: red;
+}
+
+.login.form {
+    display: grid;
+    height: 100%;
+    grid-template-rows: 40% 40% 20%;
+}
+.usn {
+    grid-row-start: 1;
+}
+.pwd {
+    grid-row-start: 2;
+}

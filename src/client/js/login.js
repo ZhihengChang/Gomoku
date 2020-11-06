@@ -2,24 +2,41 @@
 import * as util from './client_utilities.js'
 
 //Create elements
-let form = util.createDom('form');
+let [div, div_avatar, div_form, div_btn] = util.createMultiDom('div',
+    {class: 'main container'},
+    {class: 'avatar container'},
+    {class: 'form container'},
+    {class: 'submit container'}
+);
 
-let p_usn = util.createDom('p');
-let label_usn = util.createDom('label', {txt: 'Username: '});
-let input_usn = util.createDom('input', {type: 'text', id: 'username'});
-p_usn = util.addDom(p_usn, label_usn, input_usn);
+let form_login = util.createDom('form', {class: 'login form'});
+let img_avatar = util.createDom('img', {class: 'avatar img'});
 
-let p_pwd = util.createDom('p');
-let label_pwd = util.createDom('label', {txt: 'Password: '});
-let input_pwd = util.createDom('input', {type: 'password', id: 'password'});
-p_pwd = util.addDom(p_pwd, label_pwd, input_pwd);
+let [lbl_usn, lbl_pwd] = util.createMultiDom('label', 
+    {class: 'usn', txt: 'Username: '}, 
+    {class: 'pwd', txt: 'Password: '}
+);
 
-let input_login = util.createDom('input', {type: 'submit', value: 'Login'});
-let btn_signup = util.createDom('button', {txt: 'Sign Up'});
-let btn_forgot = util.createDom('button', {txt: 'Forgot username or password?'});
+let [inp_usn, inp_pwd] = util.createMultiDom('input', 
+    {type: 'text', id: 'username'}, 
+    {type: 'password', id: 'password'},
+);
+
+let [a_signup, a_recover] = util.createMultiDom('a',
+    {class: 'signup link f12', txt: 'Sign Up', href: '#'},
+    {class: 'recover link f12', txt: 'Forgot username or password?', href: '#'}
+);
+
+let btn_login = util.createDom('button', {class: 'login btn', txt: 'login'})
+
+util.addDom(lbl_usn, inp_usn);
+util.addDom(lbl_pwd, inp_pwd);
 
 //Build Page
-util.addDom(document.body, 
-    util.addDom(form, p_usn, p_pwd, input_login),
-    btn_signup, btn_forgot
-);
+util.addDom(form_login, lbl_usn, lbl_pwd, a_recover, a_signup);
+util.addDom(div_avatar, img_avatar);
+util.addDom(div_form, form_login);
+util.addDom(div_btn, btn_login);
+util.addDom(div, div_avatar, div_form, div_btn);
+util.addDom(document.body, div);
+

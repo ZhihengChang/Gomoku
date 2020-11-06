@@ -1,5 +1,5 @@
 'use strict';
-export {setAttrs, createDom, addDom, isEmpty};
+export {setAttrs, createDom, createMultiDom, addDom, isEmpty};
 /**
  * Client Utilities
  */
@@ -52,6 +52,32 @@ function createDom(tagname, ...attrs) {
         setAttrs(newElem, ...attrs);
     }
     return newElem;
+}
+
+//createMultiDom('p', 4, {1},{2})
+function createMultiDom(tagname, ...attrs){
+    if(isEmpty(attrs)){
+        return [createDom(tagname)];
+    }
+
+    let domArr = [];
+    let quantity = attrs.length;
+    
+    if(typeof attrs[0] === 'number'){
+        quantity = attrs.shift();
+    }
+    let last = attrs.slice(-1)[0] || {};
+
+    attrs.forEach(attr => {
+        domArr.push(createDom(tagname, attr));
+    });
+
+    let rest = quantity - domArr.length;
+    for(let i = 0; i < rest; i++){
+        domArr.push(createDom(tagname, last));
+    }
+
+    return domArr;
 }
 
 /**
