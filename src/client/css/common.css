@@ -1,0 +1,65 @@
+:root{
+    --menu_width: 70px;
+
+    --border_color: rgba(192, 188, 188, 0.678);
+    --shadow_color: rgb(255, 177, 51);
+    --hover_color: rgb(206, 206, 206);
+    --font_color: black;
+}
+
+html, body{
+    background-color: black;
+    display: grid;
+    height: 100%;
+    width: 100%;
+}
+
+.container{display: grid;}
+
+.btn {
+    border-radius: 6px;
+}
+
+.txtbox {
+    font-size: 16px;
+    font-size: max(16px, 1em);
+    font-family: inherit;
+    padding: 0.125em 0.25em;
+    border-radius: 6px;
+}
+
+.link{color: darkgray;}
+.link:hover{color: white;}
+
+/* Menu Bar */
+.menubtn{
+    width: max-content;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid var(--border_color);
+    color: var(--font_color);
+    cursor: pointer;
+    line-height: 2;
+    font-family: 'Montserrat', sans-serif;
+    -webkit-transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
+    transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
+    outline: 0;
+}
+
+.menubtn:focus {
+    background-color: var(--shadow_color);
+    color: white;
+    font-weight: bolder;
+    
+}
+
+.menubtn:hover:not(:focus) {
+    box-shadow: 0 0 40px 40px var(--hover_color) inset;
+    color: var(--font_color);
+    font-weight: bold;
+}
+
+.avatar{
+    border-radius: 50%;
+}
+

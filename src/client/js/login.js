@@ -17,9 +17,9 @@ let [lbl_usn, lbl_pwd] = util.createMultiDoms('label',
 );
 
 let [inp_usn, inp_pwd, inp_login] = util.createMultiDoms('input', 
-    {class: 'usn', type: 'text', id: 'username'}, 
-    {class: 'pwd', type: 'password', id: 'password'},
-    {class: 'sbm btn', type: 'submit', value: 'Login'}
+    {class: 'txtbox usn', type: 'text', id: 'username'}, 
+    {class: 'txtbox pwd', type: 'password', id: 'password'},
+    {class: 'btn sbm', type: 'submit', value: 'Login'}
 );
 
 let [a_signup, a_recover] = util.createMultiDoms('a',

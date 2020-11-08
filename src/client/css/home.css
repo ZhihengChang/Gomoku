@@ -1,0 +1,23 @@
+.main.container {
+    height: 100%;
+    width: 100%;
+    grid-template: 100% / var(--menu_width) 1fr;
+}
+
+.menu.container {
+    /* display: grid; */
+    grid-template-rows: repeat(10, 1fr);
+    background-color: white;
+    grid-row-gap: 1em;
+}
+
+.menubtn{
+    --diameter: calc(var(--menu_width) - 8px);
+    width: var(--diameter);
+    height: var(--diameter);
+    place-self: center center;
+}
+
+.st_button{
+    grid-row-start: 10;
+}
