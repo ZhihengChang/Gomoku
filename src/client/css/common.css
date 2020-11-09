@@ -7,6 +7,11 @@
     --font_color: black;
 }
 
+.on {color: green}
+.off {color: rgb(218, 32, 32)}
+.in_game {color: rgb(0, 183, 255);}
+.waiting {color: orange}
+
 html, body{
     background-color: black;
     display: grid;
@@ -61,5 +66,14 @@ html, body{
 
 .avatar{
     border-radius: 50%;
+}
+
+table, th, td {
+    text-align: center;
+    padding: 0.2em;
+}
+
+.row.head{
+    width: 100%;
 }
 

@@ -1,8 +1,9 @@
+//Client Utilities
 'use strict';
-export {setAttrs, createDom, createMultiDoms, addDom, isEmpty};
-/**
- * Client Utilities
- */
+export {setAttrs, createDom, createMultiDoms, addDom, createTableRow, insertRow, isEmpty};
+
+
+// general ###################################################################
 
 /**
  * Set specific attribute(s) to the given DOM element
@@ -55,7 +56,12 @@ function createDom(tagname, ...attrs) {
     return newElem;
 }
 
-//createMultiDom('p', 4, {1},{2})
+/**
+ * Create 1 or multiple HTMLElement based on the (optional) number within attrs
+ * or the number of attribute objects in attrs
+ * @param {String} tagname 
+ * @param  {[number], object} attrs 
+ */
 function createMultiDoms(tagname, ...attrs){
     if(isEmpty(attrs)){
         return [createDom(tagname)];
@@ -92,6 +98,30 @@ function addDom(parent, ...children) {
         parent.appendChild(child);
     }
     return parent;
+}
+
+
+// gtable ####################################################################
+
+/**
+ * 
+ * @param {HTMLElement} table 
+ * @param {object} game 
+ */
+function createTableRow(info, fn) {
+    if(isEmpty(info)){
+        return;
+    }
+    let _row = createDom('tr');
+   
+    for(let _key of Object.keys(info)){
+        let _cell = createDom('td', {txt: info[_key], 'data-key': _key.toLowerCase()});
+        if(fn){
+            fn.call(this, _cell);
+        }
+        addDom(_row, _cell);
+    }
+    return _row;
 }
 
 function isEmpty(_obj) {
