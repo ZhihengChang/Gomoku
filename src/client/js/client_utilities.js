@@ -1,6 +1,6 @@
 //Client Utilities
 'use strict';
-export {setAttrs, createDom, createMultiDoms, addDom, createTableRow, insertRow, isEmpty};
+export {setAttrs, createDom, createMultiDoms, addDom, createTableRow, isEmpty};
 
 
 // general ###################################################################
