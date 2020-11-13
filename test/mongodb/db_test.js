@@ -1,21 +1,29 @@
-const mocha = require('../../node_modules/mocha')
-const assert = require('assert');
-const User = require('./models/user');
+'use strict';
+//import * as db_util from '../../src/server/db_utilities'
 
-//Describe tests
-describe('Database tests', function(){
-    
-    //create tests
-    it('Saves a user to db', function(){
-        var user = new User({
-            user_id: 1000,
-            username: 'testPlayer',
-            level: 1,
-            status: 'online',
-        });
-        user.save().then(function(done){
-            assert(user.isNew === false);
-            done();
-        });
-    });
+
+const MongoClient = require("mongodb").MongoClient;
+const assert = require('assert');
+const url = 'mongodb://localhost:27018';
+const mongoClient = new MongoClient(url, { useUnifiedTopology: true });
+
+mongoClient.connect(function (err) {
+    assert.equal(null, err);
+    console.log("Connected Successfully");
+    //mongoClient.close();
 });
+
+const db = mongoClient.db('testdb');
+insertData(db, 'documents', {name:'eight'});
+
+
+function insertData(db, collection, ...data) {
+    if(!data.length) return;
+
+    let _collection = db.collection(collection);
+    _collection.insertMany(data).then(
+        result => {return result;}
+    ).catch(
+        err => console.error(`Failed to insert: ${err}`)
+    );
+}
