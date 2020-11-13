@@ -1,0 +1,30 @@
+{
+  "name": "gomoku",
+  "version": "1.0.0",
+  "description": "\"Add Description\"",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "dependencies": {
+    "mongodb": "^3.6.3",
+    "mongoose": "^5.10.13"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1"
+  },
+  "scripts": {
+    "test": "mocha test/mongodb/db_test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZhihengChang/Gomoku.git"
+  },
+  "author": "Zhiheng Chang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZhihengChang/Gomoku/issues"
+  },
+  "homepage": "https://github.com/ZhihengChang/Gomoku#readme"
+}
