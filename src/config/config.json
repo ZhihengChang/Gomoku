@@ -1,0 +1,10 @@
+{
+    "db": {
+        "type": "Mongodb",
+        "api": "MongoApi.js",
+        "host": "localhost",
+        "port": 27018,
+        "auth": {},
+        "option": { "useUnifiedTopology" : true }
+    }
+}
