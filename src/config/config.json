@@ -4,7 +4,11 @@
         "api": "MongoApi.js",
         "host": "localhost",
         "port": 27018,
+        "database": "testdb",
         "auth": {},
-        "option": { "useUnifiedTopology" : true }
+        "option": { 
+            "useNewUrlParser" : true,
+            "useUnifiedTopology" : true
+        }
     }
 }

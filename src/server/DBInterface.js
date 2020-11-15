@@ -1,9 +1,7 @@
 'use strict';
-class DBApi{
+class DBInterface{
 
-    constructor(){
-        
-    }
+    constructor(){}
 
     connect(){
         throw new Error(`${arguments.callee.name} is not implement`);
@@ -31,7 +29,7 @@ class DBApi{
 
 }
 
-module.exports = DBApi;
+module.exports = DBInterface;
 
 
 
