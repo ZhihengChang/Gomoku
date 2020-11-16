@@ -2,8 +2,33 @@
 let DBInterface = require('./DBInterface');
 const MongoClient = require("mongodb").MongoClient;
 
-class DBApi extends DBInterface{
+class DBConn {
+    connection = null;
 
+    constructor(url, option) {
+        this._url = url;
+        this._option = option;
+    }
+    connect = () => new Promise((resolve, reject) => {
+            MongoClient.connect(url, option, function(err, db) {
+            if (err) { reject(err); return; };
+            resolve(db);
+            this.connection = db;
+        });
+    });
+
+    get = () => {
+        if(!this.connection) {
+            throw new Error('Call connect first!');
+        }
+
+        return this.connection;
+    }
+}
+
+
+class DBApi extends DBInterface{
+    _conn;
     constructor(host, port, db, option) {
         super();
         this._url = `mongodb://${host}:${port}/`;
@@ -13,7 +38,40 @@ class DBApi extends DBInterface{
         // this._conn = this.connect();
     }
 
-    currentDB(){
+    getConn() {
+        this._conn = new DBConn(this._url, this._option);
+        this._conn.connect().catch(err => console.log(err));
+        console.log(this._conn.get());
+    }
+    getDB() {
+        // if(!this._conn){
+            this.getConn();
+        // }
+        console.log(this._conn);
+        return this._conn.get().db(this._db);
+    }
+
+    async insert1(client, collection, ...data) {
+        let result;
+        try{
+            let _collection = this.getDB().collection(collection);
+            result = await _collection.insertMany(data);
+            console.log(result);
+        }catch(err){
+            console.log(err);
+        }
+        return result;
+    }
+
+
+    /**
+     * If db (database name) is provided, switch to that db 
+     * otherwise just return current db name
+     * @param {string} db 
+     * @returns current db name
+     */
+    currentDB(db){
+        if(db) this._db = db;
         return this._db;
     }
 
@@ -103,6 +161,36 @@ class DBApi extends DBInterface{
         return result;
     }
 
+    /**
+     * Update query selected record to new values
+     * @param {promise result} client 
+     * @param {string} collection 
+     * @param {object} query 
+     * @param {object} newValue 
+     */
+    async update(client, collection, query, newValue){
+        if(!client) return;
+        if(this.isEmpty(query) || this.isEmpty(newValue)) return;
+
+        let result;
+        try{
+            let dbo = client.db(this._db);
+            let _collection = dbo.collection(collection);
+            result = await _collection.updateMany(query, newValue);
+            console.log("updateCount:", result.result.n);
+        }catch(err){
+            console.log(err);
+        }
+
+        return result;
+    }
+
+    isEmpty(_obj){
+        if (Array.isArray(_obj) && _obj.length == 0) return true;
+        if (_obj instanceof Set && _obj.size == 0) return true;
+        if (_obj instanceof Map && _obj.size == 0) return true;
+        return (!_obj || Object.keys(_obj).length == 0);
+    }
 
 }
 
