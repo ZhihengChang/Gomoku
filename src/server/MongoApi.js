@@ -1,138 +1,72 @@
 'use strict';
-let DBInterface = require('./DBInterface');
+const DBInterface = require('./DBInterface');
 const MongoClient = require("mongodb").MongoClient;
-
-class DBConn {
-    connection = null;
-
-    constructor(url, option) {
-        this._url = url;
-        this._option = option;
-    }
-    connect = () => new Promise((resolve, reject) => {
-            MongoClient.connect(url, option, function(err, db) {
-            if (err) { reject(err); return; };
-            resolve(db);
-            this.connection = db;
-        });
-    });
-
-    get = () => {
-        if(!this.connection) {
-            throw new Error('Call connect first!');
-        }
-
-        return this.connection;
-    }
-}
-
+const db_cfg = require('../config/config.json').Mongodb;
 
 class DBApi extends DBInterface{
-    _conn;
+    _conn; 
+    _db_name;
     constructor(host, port, db, option) {
         super();
         this._url = `mongodb://${host}:${port}/`;
-        this._db = db;
+        this._db_name = db;
         this._option = option;
-        this._conn = null;
-        // this._conn = this.connect();
+        //console.log(host, port, db, option);
     }
 
-    getConn() {
-        this._conn = new DBConn(this._url, this._option);
-        this._conn.connect().catch(err => console.log(err));
-        console.log(this._conn.get());
-    }
-    getDB() {
-        // if(!this._conn){
-            this.getConn();
-        // }
-        console.log(this._conn);
-        return this._conn.get().db(this._db);
+    connect(callback) {
+        MongoClient.connect(this._url, this._option, (err, client) => {
+            if(err){
+                MongoClient.close();
+                callback(err);
+            }
+            this._conn = client;
+            console.log("Database Connected");
+            callback(null);
+        })
     }
 
-    async insert1(client, collection, ...data) {
-        let result;
-        try{
-            let _collection = this.getDB().collection(collection);
-            result = await _collection.insertMany(data);
-            console.log(result);
-        }catch(err){
-            console.log(err);
+    getDB(dbName) {
+        if(this._conn){
+            return (dbName)? this._conn.db(dbName): this._conn.db(this._db_name);
         }
-        return result;
-    }
-
-
-    /**
-     * If db (database name) is provided, switch to that db 
-     * otherwise just return current db name
-     * @param {string} db 
-     * @returns current db name
-     */
-    currentDB(db){
-        if(db) this._db = db;
-        return this._db;
-    }
-
-    /**
-     * Connect to the database through the database url and option
-     * @returns {promise} client
-     */
-    async connect(){
-        let client = await MongoClient.connect(this._url, this._option)
-        .catch(err => {throw(err)});
-        return client;
+        return null;
     }
 
     /**
      * Insert one or multiple data record(s) to the specified collection 
      * in the current database.
-     * @param {promise result} client 
      * @param {string} collection 
      * @param  {...object} data 
      */
-    async insert(client, collection, ...data) {
-
-        if (!client) return;
-
+    async insert(collection, ...data) {
         if (!data.length) return;
-
-        let result;
+        let _result;
         try{
-            let dbo = client.db(this._db);
-            let _collection = dbo.collection(collection);
-            result = await _collection.insertMany(data);
-            console.log(result);
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.insertMany(data);
         }catch(err){
             console.log(err);
         }
-
-        return result;
+        return _result;
     }
 
     /**
      * Select one or multiple data record under given criteria (query)
      * in the current database.  
      * If no query provided, selet all.
-     * @param {promise result} client 
      * @param {string} collection 
      * @param {object} query 
      */
-    async select(client, collection, query){
-        if (!client) return;
-
-        let result;
+    async select(collection, query){
+        let _result;
         let _query = query || {};
         try{
-            let dbo = client.db(this._db);
-            let _collection = dbo.collection(collection);
-            result = await _collection.find(_query).toArray();
-            console.log(result);
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.find(_query).toArray();
         }catch(err){
             console.log(err);
         }
-
         return result;
     }
 
@@ -140,49 +74,39 @@ class DBApi extends DBInterface{
      * Delete one or more records from the specified collection
      * in the current database.
      * If no query provided, delete all.
-     * @param {promise result} client 
      * @param {string} collection 
      * @param {object} query 
      */
-    async delete(client, collection, query){
-        if (!client) return;
-
-        let result;
+    async delete(collection, query){
+        let _result;
         let _query = query || {};
         try{
-            let dbo = client.db(this._db);
-            let _collection = dbo.collection(collection);
-            result = await _collection.deleteMany(_query);
-            console.log("deletedCount:", result.result.n);
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.deleteMany(_query);
         }catch(err){
             console.log(err);
         }
-
-        return result;
+        return _result;
     }
 
     /**
      * Update query selected record to new values
-     * @param {promise result} client 
      * @param {string} collection 
      * @param {object} query 
      * @param {object} newValue 
      */
-    async update(client, collection, query, newValue){
+    async update(collection, query, newValue){
         if(!client) return;
         if(this.isEmpty(query) || this.isEmpty(newValue)) return;
 
-        let result;
+        let _result;
         try{
-            let dbo = client.db(this._db);
-            let _collection = dbo.collection(collection);
-            result = await _collection.updateMany(query, newValue);
-            console.log("updateCount:", result.result.n);
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.updateMany(query, newValue);
         }catch(err){
             console.log(err);
         }
-
-        return result;
+        return _result;
     }
 
     isEmpty(_obj){
@@ -194,4 +118,6 @@ class DBApi extends DBInterface{
 
 }
 
-module.exports = { DBApi };
+const dbApi = new DBApi(db_cfg.host, db_cfg.port, db_cfg.database, db_cfg.option);
+module.exports = { dbApi };
+
