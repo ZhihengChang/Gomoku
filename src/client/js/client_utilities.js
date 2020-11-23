@@ -1,7 +1,11 @@
 //Client Utilities
 'use strict';
-export {setAttrs, createDom, createMultiDoms, addDom, createTableRow, isEmpty};
-
+export {
+    setAttrs, createDom, createMultiDoms, addDom, 
+    createTableRow, 
+    generateReqBody, generatePOSTReq,
+    isEmpty
+};
 
 // general ###################################################################
 
@@ -123,6 +127,42 @@ function createTableRow(info, fn) {
     }
     return _row;
 }
+
+// fetch ####################################################################
+
+/**
+ * returns a request body that contains 
+ * action, user, current time, and request data
+ * @param {string} action 
+ * @param {object} user 
+ * @param {object} data 
+ */
+function generateReqBody(action, user, data){
+    return {
+        action: action,
+        user: user,
+        timestamp: new Date(),
+        data: data,
+    }
+}
+
+/**
+ * returns a POST request that contains
+ * method, headers, and body
+ * @param {object} reqBody 
+ * @param {[string]} contentType 
+ */
+function generatePOSTReq(reqBody, contentType){
+    if(!contentType) contentType = 'application/json';
+    return {
+        method: 'POST',
+        headers: {'content-Type': contentType},
+        body: JSON.stringify(reqBody),
+    }
+}
+
+
+// Other ####################################################################
 
 function isEmpty(_obj) {
     if (Array.isArray(_obj) && _obj.length == 0) return true;

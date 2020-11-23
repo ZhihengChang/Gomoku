@@ -10,8 +10,7 @@
   "dependencies": {
     "config": "^3.3.2",
     "js-yaml": "^3.14.0",
-    "mongodb": "^3.6.3",
-    "mongoose": "^5.10.13"
+    "mongodb": "^3.6.3"
   },
   "devDependencies": {
     "mocha": "^8.2.1"

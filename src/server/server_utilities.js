@@ -2,12 +2,25 @@
  * Server Utilities
  */
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const qs = require('querystring');
 const config = require('../config/config.json');
 const server_config = config.service;
 const db_config = config[server_config.dbType];
 
 const dbApi = require(`./${db_config.api}`).dbApi;
 module.exports = {startService};
+
+const MIMETypes = {
+    html: "text/html",
+    css: "text/css",
+    js: "text/javascript",
+}
+
+const basePath = __dirname + '/../';
+const clientPath = basePath + '/client/';
+const serverPath = basePath + '/server/';
 
 function startService() {
     dbApi.connect(err => {
@@ -17,9 +30,8 @@ function startService() {
         }
 
         http.createServer((request, response) => {
-            console.log(request.url);
-            //handle_insert_request(request, response);
-            //handle_delete_request(request, response);
+            // console.log(request.url);
+            handle_client_requests(request, response);
         }).listen(server_config.port);
 
     })
@@ -27,24 +39,68 @@ function startService() {
     
 }
 
-async function handle_insert_request(req, res){
-    let result = await dbApi.insert('documents', {name:'22'});
-    console.log(result);
+function handle_client_requests(request, response){
+
+    console.log(request.url);
+    loadPage(request, response);
+    if(request.method === 'POST'){
+        getRequestBody(request, reqBody => {
+            console.log(reqBody);
+            response.end('ok');
+        })
+        
+    }
+    // response.writeHead(200, {'content-type':'text/html'});
+    // response.write(fs.readFileSync('../client/pages/login.html'));
+    // response.end();
+
 }
 
-async function handle_delete_request(req, res){
-    let result = await dbApi.delete('documents', {name:'22'});
-    console.log("deleteCount:", result.result.n);
+function loadPage(request, response){
+    // console.log(request.url);
+    
+    //localhost:3000
+    let filePath = clientPath + request.url;
+    if(request.url == '/'){
+        filePath = clientPath + '/pages/login.html';
+    }
+
+    if(!fs.existsSync(filePath)) {
+        console.log("Not a page");
+        return;
+    }
+
+    let contentType = getContentType(filePath);
+
+    try{
+        response.writeHeader(200, {'content-type': contentType});
+        response.write(fs.readFileSync(filePath));
+        response.end();
+    }catch(err){
+        console.log(err);
+        response.writeHeader(404);
+        response.end("Page Not Found");
+    }
 }
 
-async function handle_select_request(req, res){
-    let result = await dbApi.select('documents', {name:'18'});
-    console.log(result);
+function getContentType(filePath){
+    // console.log(filePath);
+    if(filePath){
+        let key = filePath.split('.').slice(-1)[0];
+        // console.log("key:", key);
+        return MIMETypes[key];
+    }
+    return undefined;
 }
 
-async function handle_update_request(req, res){
-    let result = await dbApi.update('documents', {name:"one"}, {$set: {name: '1'}});
-    console.log(result);
-}
+async function getRequestBody(request, callBack){
+    let body = '';
+    request.on('data', chunk =>{
+        body += chunk.toString();
+    });
+    request.on('end', () => {
+        callBack(JSON.parse(body));
+    });
 
+}
 

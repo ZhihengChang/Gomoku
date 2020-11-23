@@ -25,7 +25,7 @@ let [inp_usn, inp_eml, inp_pwd, inp_cfm, inp_signup] = util.createMultiDoms('inp
     {class: 'btn sbm', type: 'submit', value: 'Sign up'}
 );
 
-let a_signin = util.createDom('a', {class: 'signin link f12', txt: 'Sign in instead', href: '#'});
+let a_signin = util.createDom('a', {class: 'signin link f12', txt: 'Sign in instead', href: '../pages/login.html'});
 
 util.addDom(form_signup, 
     // h3_formTitle,

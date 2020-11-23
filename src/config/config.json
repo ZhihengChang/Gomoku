@@ -1,6 +1,10 @@
 {
-    "db": {
-        "type": "Mongodb",
+    "service":{
+        "port": 3000,
+        "dbType": "Mongodb"
+    },
+
+    "Mongodb": {
         "api": "MongoApi.js",
         "host": "localhost",
         "port": 27018,
