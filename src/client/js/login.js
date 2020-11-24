@@ -36,7 +36,7 @@ util.addDom(div_form, form_login);
 util.addDom(div_main, div_avatar, div_form);
 util.addDom(document.body, div_main);
 
-function validateLoginForm(loginForm){
+function validateLoginForm(){
     let validator = new Validator();
     let validations = [{
         strategy: 'isNonEmpty',

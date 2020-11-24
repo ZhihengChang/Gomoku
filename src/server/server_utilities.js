@@ -50,10 +50,6 @@ function handle_client_requests(request, response){
         })
         
     }
-    // response.writeHead(200, {'content-type':'text/html'});
-    // response.write(fs.readFileSync('../client/pages/login.html'));
-    // response.end();
-
 }
 
 function loadPage(request, response){

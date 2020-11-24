@@ -33,16 +33,24 @@
     //     }
     // });
     // util.addDom(document.body, redSquare);
-    let game = {
-        playerID: 'player1',
-        playerLV: 10,
-        status: 'In Game',
-        undo: 'ON',
-        chat: 'ON',
-        boardSize: '19 X 19',
-        spectating: 0
-    };
+    // let game = {
+    //     playerID: 'player1',
+    //     playerLV: 10,
+    //     status: 'In Game',
+    //     undo: 'ON',
+    //     chat: 'ON',
+    //     boardSize: '19 X 19',
+    //     spectating: 0
+    // };
     
-    // alert(util.createTableRow(game));
-    util.addDom(document.body, util.createTableRow(game))
+    // // alert(util.createTableRow(game));
+    // util.addDom(document.body, util.createTableRow(game))
+    let str = "zhihengchang602@gmail.sdf.";
+    let udf = "sdfsdf";
+    // let regExp = /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g;
+    let regExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    let arr = [1,2];
+    let arr2 = arr.push(3);
+    alert(regExp.test(str));
+    
 </script>

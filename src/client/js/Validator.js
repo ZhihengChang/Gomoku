@@ -34,5 +34,57 @@ const strategies = {
         if(value === ''){
             return errorMsg;
         }
-    }
+    },
+
+    contianLetter: function(value, errorMsg){
+        let regExp = /[a-zA-Z]/g;
+        if(!regExp.test(value)){
+            return errorMsg;
+        }
+    },
+
+    contianUppercase: function(value, errorMsg){
+        if(value.toLowerCase() == value){
+            return errorMsg;
+        }
+    },
+
+    contianSpecialChar: function(value, errorMsg){
+        let regExp = /[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g;
+        if(!regExp.test(value)){
+            return errorMsg;
+        }
+    },
+
+    noSpecialChar: function(value, errorMsg){
+        if(!strategies.contianSpecialChar(value, errorMsg)){
+            return errorMsg;
+        }
+    },
+
+    contianDigit: function(value, errorMsg){
+        let regExp = /\d/;
+        if(!regExp.test(value)){
+            return errorMsg;
+        }
+    },
+
+    isValidEmail: function(value, errorMsg){
+        let regExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+        if(!regExp.test(value)){
+            return errorMsg;
+        }
+    },
+
+    minLength: function(value, length, errorMsg){
+        if(value.length < length){
+            return errorMsg;
+        }
+    },
+
+    isMatch: function(value, confirm, errorMsg){
+        if(value != confirm){
+            return errorMsg;
+        }
+    },
 };
