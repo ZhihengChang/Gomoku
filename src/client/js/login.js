@@ -12,6 +12,7 @@ let [div_main, div_avatar, div_form] = util.createMultiDoms('div',
 
 let form_login = util.createDom('form', {class: 'login form'});
 let img_avatar = util.createDom('img', {class: 'avatar img'});
+let span_msg = util.createDom('span', {class: 'msg f15'});
 
 let [lbl_usn, lbl_pwd] = util.createMultiDoms('label', 
     {class: 'usn_lable', txt: 'Username: '}, 
@@ -30,7 +31,7 @@ let [a_signup, a_recover] = util.createMultiDoms('a',
 );
 
 //Build Page
-util.addDom(form_login, lbl_usn, inp_usn, lbl_pwd, inp_pwd, inp_login, a_recover, a_signup);
+util.addDom(form_login, span_msg, lbl_usn, inp_usn, lbl_pwd, inp_pwd, inp_login, a_recover, a_signup);
 util.addDom(div_avatar, img_avatar);
 util.addDom(div_form, form_login);
 util.addDom(div_main, div_avatar, div_form);
@@ -48,21 +49,29 @@ function validateLoginForm(){
 }
 
 async function login(){
-    let errorMsg = validateLoginForm();
-    if(errorMsg){
-        console.log(errorMsg);
-        return;
+    let _errorMsg = validateLoginForm();
+    if(_errorMsg){
+        util.displayMsg(span_msg, _errorMsg, 'red');
+        return; 
     }
         
-    let inputs = form_login.elements;
-    let data = {
-        username: inputs.username.value,
-        password: md5.b64_md5(inputs.password.value),
-    }, user = {};
-    let reqBody = util.generateReqBody('login', user, data);
-    let request = util.generatePOSTReq(reqBody);
-    let response = await fetch('/login', request);
-    console.log(response);
+    let _inputs = form_login.elements;
+    let _data = {
+        username: _inputs.username.value,
+        password: md5.b64_md5(_inputs.password.value),
+    }, _user = {};
+    let _reqBody = util.generateReqBody('login', _user, _data);
+    let _request = util.generatePOSTReq(_reqBody);
+    let _res = await fetch('/login', _request);
+    let _response = await _res.json();
+    console.log(location.href);
+    if(_response.status === 'SUCCESS'){
+        let _user = _response.data;
+        window.open(`http://${location.host}/pages/home.html`, '_self');
+        console.log(_user);
+    }else{
+        util.displayMsg(span_msg, _response.data.message, 'red');
+    }
 
 }
 inp_login.addEventListener('click', login);

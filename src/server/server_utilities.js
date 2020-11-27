@@ -1,16 +1,11 @@
-/**
- * Server Utilities
- */
-const http = require('http');
+'use strict';
 const fs = require('fs');
 const path = require('path');
-const qs = require('querystring');
-const config = require('../config/config.json');
-const server_config = config.service;
-const db_config = config[server_config.dbType];
 
-const dbApi = require(`./${db_config.api}`).dbApi;
-module.exports = {startService};
+module.exports = {
+    loadPage, getContentType, getRequestBody, 
+    sendJsonResponse, isEmpty
+};
 
 const MIMETypes = {
     html: "text/html",
@@ -22,36 +17,6 @@ const basePath = __dirname + '/../';
 const clientPath = basePath + '/client/';
 const serverPath = basePath + '/server/';
 
-function startService() {
-    dbApi.connect(err => {
-        if(err){
-            console.log(err);
-            return;
-        }
-
-        http.createServer((request, response) => {
-            // console.log(request.url);
-            handle_client_requests(request, response);
-        }).listen(server_config.port);
-
-    })
-
-    
-}
-
-function handle_client_requests(request, response){
-
-    console.log(request.url);
-    loadPage(request, response);
-    if(request.method === 'POST'){
-        getRequestBody(request, reqBody => {
-            console.log(reqBody);
-            response.end('ok');
-        })
-        
-    }
-}
-
 function loadPage(request, response){
     // console.log(request.url);
     
@@ -62,7 +27,7 @@ function loadPage(request, response){
     }
 
     if(!fs.existsSync(filePath)) {
-        console.log("Not a page");
+        // console.log("Not a page");
         return;
     }
 
@@ -100,3 +65,30 @@ async function getRequestBody(request, callBack){
 
 }
 
+/**
+ * write and send json response to client
+ * @param {Response} response 
+ * @param {string} event 
+ * @param {number} code 
+ * @param {string} status 
+ * @param {object} data 
+ */
+function sendJsonResponse(response, event, code, status, data){
+    response.writeHead(code, {"Content-Type": "application/json"});
+    let _data = data || {};
+    let _res = {
+        event: event,
+        status: status,
+        data: _data,
+    };
+    response.write(JSON.stringify(_res));
+    response.end();
+}
+
+function isEmpty(_obj) {
+    if (Array.isArray(_obj) && _obj.length == 0) return true;
+    if (_obj instanceof Set && _obj.size == 0) return true;
+    if (_obj instanceof Map && _obj.size == 0) return true;
+
+    return (!_obj || Object.keys(_obj).length == 0);
+}

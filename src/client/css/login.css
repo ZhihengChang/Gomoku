@@ -71,5 +71,11 @@ input:focus {color: white;}
     color: black;
 }
 
+.msg{
+    grid-row-start: 5;
+    grid-column-start: span 8;
+    place-self: start center;
+}
+
 
 

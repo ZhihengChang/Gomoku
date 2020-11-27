@@ -7,7 +7,7 @@
 .signup.form {
     display: grid;
     height: 100%;
-    grid-template: repeat(8, 1fr) / repeat(7, 1fr);
+    grid-template: repeat(8, 1fr) / repeat(8, 1fr);
     grid-row-gap: 0.7em;
 }
 
@@ -19,10 +19,15 @@ input:focus {color: white;}
     grid-column: 3 / 8;
 }
 
-.usn_lable, .eml_lable, .pwd_lable, .cfm_lable{
+.usn_lable, .eml_lable, .bhd_lable, .pwd_lable, .cfm_lable{
     color: white;
     grid-column: 1 / 3;
     place-self: center start;
+}
+
+.msg, .sbm, .signin{
+    grid-column-start: span 8;
+    place-self: start center;
 }
 
 .usn_lable, .usn{
@@ -33,20 +38,26 @@ input:focus {color: white;}
     grid-row-start: 2;
 }
 
-.pwd_lable, .pwd{
+.bhd_lable, .bhd{
     grid-row-start: 3;
 }
 
-.cfm_lable, .cfm{
+.pwd_lable, .pwd{
     grid-row-start: 4;
+}
+
+.cfm_lable, .cfm{
+    grid-row-start: 5;
+}
+
+.msg{
+    grid-row-start: 6;
 }
 
 .sbm {
     border: 1px solid white;
-    grid-row-start: 6;
-    grid-column-start: span 8;
+    grid-row-start: 7;
     padding: 0.7em 2.5em 0.7em 2.5em;
-    place-self: center center;
 }
 
 .sbm:hover{
@@ -56,7 +67,6 @@ input:focus {color: white;}
 }
 
 .signin{
-    grid-row-start: 7;
+    grid-row-start: 8;
     grid-column-start: span 8;
-    place-self: start center;
 }

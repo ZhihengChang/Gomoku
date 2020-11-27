@@ -67,7 +67,7 @@ class DBApi extends DBInterface{
         }catch(err){
             console.log(err);
         }
-        return result;
+        return _result;
     }
 
     /**
@@ -96,13 +96,29 @@ class DBApi extends DBInterface{
      * @param {object} newValue 
      */
     async update(collection, query, newValue){
-        if(!client) return;
         if(this.isEmpty(query) || this.isEmpty(newValue)) return;
 
         let _result;
         try{
             let _collection = this.getDB().collection(collection);
             _result = await _collection.updateMany(query, newValue);
+        }catch(err){
+            console.log(err);
+        }
+        return _result;
+    }
+
+    /**
+     * Count the total number of documents within collection
+     * @param {string} collection 
+     * @param {object} query 
+     */
+    async count(collection, query){
+        let _result;
+        let _query = query || {};
+        try{
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.countDocuments(_query);
         }catch(err){
             console.log(err);
         }

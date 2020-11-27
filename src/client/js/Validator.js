@@ -76,6 +76,13 @@ const strategies = {
         }
     },
 
+    isValidBirthday: function(value, errorMsg){
+        let regExp = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
+        if(!regExp.test(value)){
+            return errorMsg;
+        }
+    },
+
     minLength: function(value, length, errorMsg){
         if(value.length < length){
             return errorMsg;

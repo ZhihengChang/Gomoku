@@ -4,6 +4,7 @@ export {
     setAttrs, createDom, createMultiDoms, addDom, 
     createTableRow, 
     generateReqBody, generatePOSTReq,
+    hideDom, showDom, displayMsg,
     isEmpty
 };
 
@@ -104,6 +105,20 @@ function addDom(parent, ...children) {
     return parent;
 }
 
+function hideDom(elem){
+    setAttrs(elem, {style: {display: 'none'}});
+}
+
+function showDom(elem){
+    setAttrs(elem, {style: {display: 'block'}});
+}
+
+function displayMsg(elem, msg, color){
+    setAttrs(elem, {
+        txt: msg, 
+        style: {color: color}
+    });
+}
 
 // gtable ####################################################################
 
