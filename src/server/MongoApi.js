@@ -109,6 +109,25 @@ class DBApi extends DBInterface{
     }
 
     /**
+     * Replace specified object in the collection
+     * @param {string} collection 
+     * @param {object} query 
+     * @param {object} newObj 
+     */
+    async replace(collection, query, newObj){
+        if(this.isEmpty(query) || this.isEmpty(newObj)) return;
+
+        let _result;
+        try{
+            let _collection = this.getDB().collection(collection);
+            _result = await _collection.replaceOne(query, newObj);
+        }catch(err){
+            console.log(err);
+        }
+        return _result;
+    }
+
+    /**
      * Count the total number of documents within collection
      * @param {string} collection 
      * @param {object} query 

@@ -1,5 +1,6 @@
 'use strict';
 import * as util from './client_utilities.js'
+var authToken;
 
 //Create elements
 let [div_main, div_menu, div_gtable] = util.createMultiDoms('div',
@@ -47,6 +48,36 @@ util.addDom(div_gtable, tbl_gtable);
 //main
 util.addDom(div_main, div_menu, div_gtable);
 util.addDom(document.body, div_main);
+
+document.addEventListener("DOMContentLoaded", ()=>{
+    let _authToken = sessionStorage.getItem('authToken');
+    console.log("auth token:" + _authToken);
+    if(!_authToken){
+        document.body.innerHTML = ''
+    }
+});
+
+window.addEventListener("unload", function() {
+    delete sessionStorage.authToken;
+    delete sessionStorage.user;
+});
+
+window.onload = () => {
+    
+}
+
+//del this
+// console.log(location);
+let socket = new WebSocket(`ws://${location.host}/chat`);
+btn_profile.addEventListener('click', function(){
+    socket.send(sessionStorage.user);
+})
+
+socket.onmessage = function(event) {
+    let message = event.data;
+    alert(message);
+}
+
 
 /**
  * 

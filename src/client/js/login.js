@@ -64,14 +64,27 @@ async function login(){
     let _request = util.generatePOSTReq(_reqBody);
     let _res = await fetch('/login', _request);
     let _response = await _res.json();
-    console.log(location.href);
+
     if(_response.status === 'SUCCESS'){
-        let _user = _response.data;
-        window.open(`http://${location.host}/pages/home.html`, '_self');
+        _user = _response.data;
+        // console.log(_authToken);
+        // localStorage.setItem('authToken', _user.authToken);
+        sessionStorage.setItem('authToken', _user.authToken);
+        sessionStorage.setItem('user', JSON.stringify(_user));
+        let newWin = window.open(`${location.origin}/pages/home.html`, '_self');
+        // let newWin = window.open(`${location.origin}/pages/home.html`);
+        // newWin.addEventListener('DOMContentLoaded', ()=> {
+        //     // newWin.postMessage(_user.authToken, newWin.location.origin);
+            
+        // }, false);
         console.log(_user);
     }else{
         util.displayMsg(span_msg, _response.data.message, 'red');
     }
+  
+
+    
+   
 
 }
 inp_login.addEventListener('click', login);

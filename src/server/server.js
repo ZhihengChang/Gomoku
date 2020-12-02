@@ -2,6 +2,7 @@
  * Server Utilities
  */
 const http = require('http');
+const ws = new require('ws');
 const util = require('./server_utilities');
 const config = require('../config/config.json');
 const server_config = config.service;
@@ -20,9 +21,19 @@ function startService() {
         
         let proxyServer = new ProxyServer(dbApi);
         
-        http.createServer((request, response) => {
-            proxyServer.handle_client_requests(request, response);
-        }).listen(server_config.port);
+        let httpServer = http.createServer((request, response) => {
+            proxyServer.handle_http_requests(request, response);
+            // proxyServer.handle_webSocket_requests(request, response);
+        });
+        
+        const wss_game = new ws.Server({noServer: true});
+        const wss_chat = new ws.Server({noServer: true});
+        //proxyServer.addWebSocketServer('game', wss);
+        httpServer.on('upgrade', (request, socket, head) => {
+            proxyServer.handle_wss_requests(wss_game, request, socket, head);
+        });
+
+        httpServer.listen(server_config.port);
 
     })
 

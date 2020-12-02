@@ -1,10 +1,14 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const CryptoJS = require('crypto-js');
+
 
 module.exports = {
-    loadPage, getContentType, getRequestBody, 
-    sendJsonResponse, isEmpty
+    loadPage, getContentType, 
+    getRequestBody, sendJsonResponse, 
+    createBase64JWT,
+    isEmpty,
 };
 
 const MIMETypes = {
@@ -44,6 +48,10 @@ function loadPage(request, response){
     }
 }
 
+/**
+ * Get the corresponding MIME type from the given file path
+ * @param {string} filePath 
+ */
 function getContentType(filePath){
     // console.log(filePath);
     if(filePath){
@@ -54,6 +62,11 @@ function getContentType(filePath){
     return undefined;
 }
 
+/**
+ * Get the JSON request body
+ * @param {request} request 
+ * @param {function} callBack 
+ */
 async function getRequestBody(request, callBack){
     let body = '';
     request.on('data', chunk =>{
@@ -85,10 +98,46 @@ function sendJsonResponse(response, event, code, status, data){
     response.end();
 }
 
+/**
+ * Check the given object/array/map/set is empty
+ * @param {*} _obj 
+ */
 function isEmpty(_obj) {
     if (Array.isArray(_obj) && _obj.length == 0) return true;
     if (_obj instanceof Set && _obj.size == 0) return true;
     if (_obj instanceof Map && _obj.size == 0) return true;
 
     return (!_obj || Object.keys(_obj).length == 0);
+}
+
+/**
+ * Create base64 JWT
+ * @param {string} header 
+ * @param {string} payload 
+ * @param {string} secretKey 
+ * @param {boolean} toEnc 
+ */
+function createBase64JWT(header, payload, secretKey, toEnc = true) {
+
+    let _base64Header = (!toEnc)? header: getEncoded(header, 'Base64');
+    let _base64Payload = (!toEnc)? payload: getEncoded(payload, 'Base64');
+    let _signature = CryptoJS.HmacSHA256(`${_base64Header}.${_base64Payload}`, secretKey);
+    // console.log(`_signature: ${_signature}`);
+    // console.log(`_base64Payload:${_base64Payload}`);
+    // console.log(`_base64Payload dec str:${JSON.parse(this.getDecoded(_base64Payload, 'Base64'))}`);
+
+    let _base64Sign = CryptoJS.enc.Base64.stringify(_signature);
+    // let _base64Sign = getBase64Encoded(_signature);
+
+    return `${_base64Header}.${_base64Payload}.${_base64Sign}`.trim();
+}
+
+function getEncoded( rawStr, encType ) {
+    let _wordArray = CryptoJS.enc.Utf8.parse(rawStr);
+    return CryptoJS.enc[encType].stringify(_wordArray); 
+}
+
+function getDecoded( encStr, encType ) {
+    let _wordArray = CryptoJS.enc[encType].parse( encStr);
+    return _wordArray.toString( CryptoJS.enc.Utf8 );
 }

@@ -127,11 +127,11 @@ async function signup(){
 
     let _msg = _response.data.message;
     if(_response.status === 'SUCCESS'){
-        util.displayMsg(span_msg, msg, 'green');
+        util.displayMsg(span_msg, _msg, 'green');
         setTimeout(() => a_signin.click(), 500);
         return;
     }
-    util.displayMsg(span_msg, msg, 'red');
+    util.displayMsg(span_msg, _msg, 'red');
 }
 
 inp_signup.addEventListener('click', signup);
