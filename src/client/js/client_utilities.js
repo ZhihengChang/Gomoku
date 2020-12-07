@@ -98,9 +98,11 @@ function createMultiDoms(tagname, ...attrs){
  * @param  {...HTMLElement} children 
  */
 function addDom(parent, ...children) {
-    if (!children) return;
-    for (let child of children) {
-        parent.appendChild(child);
+    if (!isEmpty(children)){
+        for (let child of children) {
+            if(child == null) continue;
+            parent.appendChild(child);
+        }
     }
     return parent;
 }

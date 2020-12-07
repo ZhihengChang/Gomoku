@@ -1,90 +1,72 @@
 'use strict';
-import * as util from './client_utilities.js'
+import * as util from './client_utilities.js';
+import {createPage} from './createPage.js';
 var authToken;
 
-//Create elements
-let [div_main, div_menu, div_gtable] = util.createMultiDoms('div',
-    {class: 'main container'},
-    {class: 'menu container'},
-    {class: 'gtable container'},
-);
-
-let [btn_home, btn_profile, btn_friends, btn_create, btn_settings] = util.createMultiDoms('button',
-    {class: 'btn menubtn hm_button', txt: 'Home'},
-    {class: 'btn menubtn pf_button', txt: 'Profile'},
-    {class: 'btn menubtn fd_button', txt: 'Friends'},
-    {class: 'btn menubtn ct_button', txt: 'Create'},
-    {class: 'btn menubtn st_button', txt: 'Setting'},
-);
-
-let tbl_gtable = util.createDom('table', {class: 'tbl gtable'});
-let thd_gtable_head = util.createDom('thead', {class: 'thd'});
-let tbd_gtable_body = util.createDom('tbody', {class: 'tbd'});
-let tft_gtable_foot = util.createDom('tfoot', {class: 'tft'});
-
-let [tr_head, tr_foot] = util.createMultiDoms('tr',
-    {class: 'row head'},
-    {class: 'row foot'}
-);
-
-let [th_id, th_level, th_status, th_undo, th_chat, th_size, th_spect, th_action] = util.createMultiDoms('th',
-    {txt: 'Player ID'}, {txt: 'LV'}, {txt: 'Status'}, {txt: 'Undo'}, {txt: 'Chat'},
-    {txt: 'Board Size'}, {txt: 'Spectating'}, {txt: ''}
-);
-
-//Test
-// let game = {playerID: 'player1',playerLV: 10,status: 'Waiting',undo: 'OFF',chat: 'ON',boardSize: '19 X 19',spectating: 0};
-// util.addDom(tbd_gtable_body, util.createTableRow(game, setTdColor));
+let default_page = createPage.home();
+let display = default_page.display;
+let menu = default_page.menu;
+util.addDom(document.body, default_page.div_main);
 
 
-//menu
-util.addDom(div_menu, btn_home, btn_profile, btn_friends, btn_create, btn_settings);
-//gtable
-util.addDom(tr_head, th_id, th_level, th_status, th_undo, th_chat, th_size, th_spect, th_action);
-util.addDom(thd_gtable_head, tr_head);
-util.addDom(tft_gtable_foot, tr_foot);
-util.addDom(tbl_gtable, thd_gtable_head, tbd_gtable_body, tft_gtable_foot);
-util.addDom(div_gtable, tbl_gtable);
-//main
-util.addDom(div_main, div_menu, div_gtable);
-util.addDom(document.body, div_main);
+menu.btn_home.addEventListener('click', function(){
+    let _home = createPage.home();
+    document.body.innerHTML = '';
+    util.addDom(document.body, _home.div_main);
+});
 
-document.addEventListener("DOMContentLoaded", ()=>{
+menu.btn_profile.addEventListener('click', function(){
+    document.body.innerHTML = '';
+    let _profile = createPage.profile();
+    let _user = JSON.parse(sessionStorage.user);
+    // console.log(_user);
+    //load user info
+    // _profile.display.p_level.textContent += _user.exp;
+    _profile.display.p_name.textContent = _user.username;
+    _profile.display.p_id.textContent += _user.userId;
+    _profile.display.p_birthday.textContent = _user.birthday;
+    util.addDom(document.body, _profile.div_main);
+});
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
     let _authToken = sessionStorage.getItem('authToken');
     console.log("auth token:" + _authToken);
-    if(!_authToken){
+    if (!_authToken) {
         document.body.innerHTML = ''
     }
 });
 
-window.addEventListener("unload", function() {
+window.addEventListener("unload", function () {
     delete sessionStorage.authToken;
     delete sessionStorage.user;
 });
 
 window.onload = () => {
-    
+
 }
 
 //del this
 // console.log(location);
-let socket = new WebSocket(`ws://${location.host}/chat`);
-btn_profile.addEventListener('click', function(){
-    socket.send(sessionStorage.user);
-})
+// let socket = new WebSocket(`ws://${location.host}/chat`);
+// home.menu.btn_profile.addEventListener('click', function () {
+//     socket.send(sessionStorage.user);
+// })
 
-socket.onmessage = function(event) {
-    let message = event.data;
-    alert(message);
-}
+// socket.onmessage = function (event) {
+//     let message = event.data;
+//     alert(message);
+// }
 
 
 /**
  * 
  * @param {HTMLElement} cell 
  */
-function setTdColor(cell){
-    if(['undo', 'chat', 'status'].includes(cell.dataset.key)){
-        cell.classList.add(cell.textContent.replace(' ','_').toLowerCase());
+function setTdColor(cell) {
+    if (['undo', 'chat', 'status'].includes(cell.dataset.key)) {
+        cell.classList.add(cell.textContent.replace(' ', '_').toLowerCase());
     }
 }

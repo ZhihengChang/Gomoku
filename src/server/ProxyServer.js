@@ -49,9 +49,9 @@ class ProxyServer {
                 }
             });
 
-            ws.on('close', function () {
-                this._clients.delete(ws);
-            });
+            // ws.on('close', function () {
+            //     this._clients.delete(ws);
+            // });
         });
     }
 }

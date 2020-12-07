@@ -23,7 +23,15 @@ class DBInterface{
         throw new Error(`${arguments.callee.name} is not implement`);
     }
 
+    replace(){
+        throw new Error(`${arguments.callee.name} is not implement`);
+    }
+
     delete(){
+        throw new Error(`${arguments.callee.name} is not implement`);
+    }
+
+    count(){
         throw new Error(`${arguments.callee.name} is not implement`);
     }
 
