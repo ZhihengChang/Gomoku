@@ -55,15 +55,8 @@ input:focus {color: white;}
 }
 
 .sbm {
-    border: 1px solid white;
     grid-row-start: 7;
     padding: 0.7em 2.5em 0.7em 2.5em;
-}
-
-.sbm:hover{
-    background-color: lightgray;
-    border: 1px solid lightgray;
-    color: black;
 }
 
 .signin{

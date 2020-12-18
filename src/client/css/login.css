@@ -58,17 +58,10 @@ input:focus {color: white;}
 }
 
 .sbm {
-    border: 1px solid white;
     grid-row-start: 4;
     grid-column-start: span 8;
     padding: 0.7em 2em 0.7em 2em;
     place-self: center center;
-}
-
-.sbm:hover{
-    background-color: lightgray;
-    border: 1px solid lightgray;
-    color: black;
 }
 
 .msg{

@@ -9,7 +9,8 @@ export const createPage = {
     signup: () => buildPage(null, createDisplay.signup()),
     home: () => buildPage(createMenu.mainMenu(), createDisplay.gameTable()),
     profile: () => buildPage(createMenu.mainMenu(), createDisplay.profile()),
-    game: () => buildPage(createMenu.gameMenu(), createDisplay.game()),
+    newGame: () => buildPage(createMenu.mainMenu(), createDisplay.newGame()),
+    inGame: () => buildPage(createMenu.gameMenu(), createDisplay.inGame()),
 }
 
 function buildPage(menu, display){
