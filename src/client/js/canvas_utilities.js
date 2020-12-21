@@ -2,7 +2,7 @@
 
 export {
     drawLine, drawVerticalLine, drawHorizontalLine, 
-    drawSquare, fillBackground,
+    drawSquare, drawCircle, fillBackground,
     setStyles, clear
 };
 
@@ -35,6 +35,14 @@ function drawHorizontalLine(ctx, start, length){
 
 function drawSquare(ctx, start, length){
     ctx.strokeRect(start.x, start.y, length, length);
+}
+
+function drawCircle(ctx, center, radius, color){
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, radius, 0, Math.PI * 2, true);
+    ctx.fillStyle = color;
+    ctx.stroke();
+    ctx.fill();
 }
 
 function clear(ctx){
