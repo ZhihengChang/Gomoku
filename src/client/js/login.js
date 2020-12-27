@@ -40,8 +40,8 @@ async function login(){
 
     if(_response.status === 'SUCCESS'){
         _user = _response.data;
-        sessionStorage.setItem('authToken', _user.authToken);
-        sessionStorage.setItem('user', JSON.stringify(_user));
+        localStorage.authToken = _user.authToken;
+        localStorage.user = JSON.stringify(_user);
         let newWin = window.open(`${location.origin}/pages/home.html`, '_self');
         console.log(_user);
     }else{
@@ -52,7 +52,7 @@ display.inp_login.addEventListener('click', login);
 
 window.onload = function() { 
     clearAllInputs();
-};
+}
 
 function clearAllInputs(){
     document.querySelectorAll('.txtbox').forEach( elem => {elem.value = ''});

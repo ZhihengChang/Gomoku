@@ -23,5 +23,13 @@ tr:nth-child(even) {
     background:rgb(24, 24, 24);
 }
 
+.action {
+    text-align: center;
+}
+
+td.action .btn:nth-child(2){
+    margin-left: 1em;
+}
+
 
 

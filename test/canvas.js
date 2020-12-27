@@ -1,64 +1,62 @@
 'use strict';
 import * as util from '../src/client/js/client_utilities.js';
-import GameBoard from '../src/client/js/GameBoard.js';
+import { createPage } from '../src/client/js/createPage.js';
+import GameBoard from './GameBoard.js';
 
-let canvas = util.createDom('canvas', {
-    style:{
-        // backgroundColor: 'rgb(204, 147, 82)',
-        display: 'block',
-        border: '2px solid black',
+var TIMEOUT = false;
+var DELAY = 150;
+
+let _default_options = {
+    gameBoard: {
+        size: 14,
+        edge: 3,
+        lineColor: 'black',
+        edgeColor: 'black',
+        backgroundColor: 'rgb(204, 147, 82)',
+    },
+    piece: {
+        radius: 20,
+        lineColor: 'black',
+        fillColor: 'white',
     }
+}
+
+let _inGame = createPage.inGame();
+util.addDom(document.body, _inGame.div_main);
+
+let _display = _inGame.display;
+let _canvas = _display.canvas_gameboard;
+
+let _gameBoard = new GameBoard(_canvas, _default_options);
+redrawGameBoard();
+
+window.addEventListener('resize', gameBoardFitWindow);
+
+_canvas.addEventListener("mousedown", (event) => {
+    let coordinate = getMouseCoordinate(_canvas, event);
+    _gameBoard.drawStep(coordinate);
 });
 
-util.addDom(document.body, canvas);
-let minLength = Math.min(window.innerWidth, window.innerHeight);
-canvas.setAttribute('width', minLength);
-canvas.setAttribute('height', minLength);
+function getMouseCoordinate(canvas, event) {
+    let rect = canvas.getBoundingClientRect();
+    let position = _gameBoard.getRelativePosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+    });
+    return position;
+}
 
-let board = new GameBoard(canvas, {
-    edge: 3, //percentage
-    backgroundColor: 'rgb(204, 147, 82)',
-});
+function gameBoardFitWindow() {
+    clearTimeout(TIMEOUT);
+    TIMEOUT = setTimeout(redrawGameBoard, DELAY);
+}
 
-board.drawBoard(19);
-
-window.addEventListener('resize', function(){
-    minLength = Math.min(window.innerWidth, window.innerHeight);
-    canvas.setAttribute('width', minLength);
-    canvas.setAttribute('height', minLength);
-    board.drawBoard(19);
-})
-
-
-
-
-
-
-// let ctx = canvas.getContext('2d');
-
-// let size = 14;
-// let gap = canvas.width / size;
-// for(let i = 1; i < size; i++){
-//     let v_start = {x: i * gap, y: 0};
-//     let h_start = {x: 0, y: i * gap};
-//     drawVerticalLine(ctx, v_start, canvas.width);
-//     drawHorizontalLine(ctx, h_start, canvas.width);
-// }
-
-// function drawLine(ctx, start, end){
-//     ctx.beginPath();
-//     ctx.moveTo(start.x, start.y);
-//     ctx.lineTo(end.x, end.y);
-//     ctx.stroke();
-//     ctx.closePath();
-// }
-
-// function drawVerticalLine(ctx, start, length){
-//     drawLine(ctx, start, {x: start.x, y: start.y + length});
-// }
-
-// function drawHorizontalLine(ctx, start, length){
-//     drawLine(ctx, start, {x: start.x + length, y: start.y});
-// }
-
-
+/**
+ * recreate the game board based on the window size
+ */
+function redrawGameBoard(){
+    let curWidth = _display.div_game.clientWidth;
+    let curHeight = _display.div_game.clientHeight - _display.div_statbar.clientHeight;
+    _gameBoard.setSize(Math.min(curWidth, curHeight));
+    _gameBoard.draw();
+}

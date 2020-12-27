@@ -1,18 +1,19 @@
 'use strict';
-import * as util from './canvas_utilities.js';
+import * as util from '../src/client/js/canvas_utilities.js';
+import Piece from '../src/client/js/Piece.js';
+import Shape from '../src/client/js/Shape.js'
 
-
-export default class GameBoard{
+export default class GameBoard extends Shape{
 
     _gap; //line gap within the board.
     _dist; //the distence btw the outer border and inner border.
     _edgeLineWidth; //the inner border line width.
+    _edgeDist; //the sum of dist and edgeLineWidth.
     _lineWidth; //the regular line width.
     _lineLength; //the inner border line length.
 
     _stepQueue; //step (coordinates) array.
-    _firstTask; //stepQueue drawing process thread 1
-    _secondTask; //stepQueue drawing process thread 2
+    _stepQueuePointer;
 
     /**
      * create GameBoard object
@@ -27,48 +28,59 @@ export default class GameBoard{
      *  lineWidth: {number} the line width
      */
     constructor(canvas, options){
-        this._canvas = canvas;
-        this._ctx = canvas.getContext('2d');
+        console.log("gameboard init...");
+        super(canvas, options.gameBoard);
+        this._piece = new Piece(canvas, options.piece);
 
-        this._boardOptions = options.gameBoard;
-        this._pieceOptions = options.piece;
-
+        this._gap = 0;
+        this._dist = 0;
+        this._edgeLineWidth = 0;
+        this._edgeDist = 0;
+        this._lineWidth = 0;
+        this._lineLength = 0;
         this._stepQueue = [];
-        this._firstTask = false;
-        this._secondTask = false;
+        this._stepQueuePointer = 0;
+  
     }
- 
-    draw(){
-        this._size = this._boardOptions.size;
+
+    draw() {
+        this._size = this._options.size;
         this.drawBoard(this._size);
-        this.drawStepQueue();
+        // this._stepQueue.forEach( step => {
+        //     this.drawStep(step);
+        // });
+
+        // let gap = this._gap;
+        // let dist = this._edgeDist;
+        let fullLength = this._stepQueue.length;
+        let numOfThread = 2;
+        let threadLength = Math.floor(fullLength / numOfThread);
+        let leftOver = fullLength - (numOfThread * threadLength);
+        let drawers = [];
+        let stepQueue = JSON.stringify(this._stepQueue);
+        
+        let data = {
+            gap: this._gap,
+            dist: this._edgeDist,
+            piece: this._piece,
+        }
+
+        for(let i = 0; i < numOfThread; i++){
+            drawers.push(new Worker('./pieceDrawer.js'));
+        }
+        
+        for(let i = 0; i < numOfThread; i++){
+            data.start = i * threadLength;
+            data.end = (i + 1) * threadLength;
+
+            if(i == numOfThread - 1) end += leftOver;
+            
+            // drawers[i].postMessage({start, end, gap, dist, stepQueue});
+            drawers[i].postMessage(data);
+        }
+        
     }
 
-    drawStepQueue(){
-        if (this._stepQueue.length == 0) return;
-
-        let _maxSteps = 10;
-        let _totalSteps =  this._stepQueue.length;
-
-        if ( _totalSteps >= _maxSteps ) {
-            
-            if(this._firstTask) {clearTimeout(this._firstTask)};
-            this._firstTask = setTimeout(() => {
-                Array.from(this._stepQueue.slice(1, Math.floor(_totalSteps/2)))
-                        .forEach(_step => this.drawStep(_step, true));
-            });
-            
-            if(this._secondTask) {clearTimeout(this._secondTask)};
-            this._secondTask = setTimeout(() => {
-                Array.from(this._stepQueue.slice(Math.floor(_totalSteps/2), _totalSteps))
-                        .forEach(_step => this.drawStep(_step, true));
-            });
-
-            return;
-        };
-
-        this._stepQueue.forEach(_step => this.drawStep(_step, true));
-    }
 
     drawBoard(size) {
         if (this._ctx) {
@@ -79,7 +91,7 @@ export default class GameBoard{
 
             //init state
             util.setStyles(this._ctx, {
-                strokeStyle: this._boardOptions.lineColor,
+                strokeStyle: this._options.lineColor,
                 lineWidth: this._lineWidth,
             })
             this._ctx.save();
@@ -89,18 +101,18 @@ export default class GameBoard{
         
             //set options:
             util.setStyles(this._ctx, {
-                strokeStyle: this._boardOptions.edgeColor,
-                fillStyle: this._boardOptions.backgroundColor,
+                strokeStyle: this._options.edgeColor,
+                fillStyle: this._options.backgroundColor,
             });
             
             //fill background
             util.fillBackground(this._ctx);
             
             //draw edge
-            if(this._boardOptions.edge){
+            if(this._options.edge){
                 //update variable
                 this._edgeLineWidth = this._lineWidth * 2;
-                this._dist = board_width * (this._boardOptions.edge / 100) + this._edgeLineWidth;
+                this._dist = board_width * (this._options.edge / 100) + this._edgeLineWidth;
                 this._lineLength -= 2 * this._dist;
                 this._edgeDist = this._dist + this._edgeLineWidth
     
@@ -125,21 +137,14 @@ export default class GameBoard{
         }
     }
 
-    drawStep(position, redraw){
-        if(!redraw){
-            this._stepQueue.push(position);
-        }
+    drawStep(position){
+        this._stepQueue.push(position);
+        this._piece.setRadius(this._radius);
         let coordinate = {
             x: position.col * this._gap + this._edgeDist,
             y: position.row * this._gap + this._edgeDist,
         }
-        this.drawPiece(coordinate);
-    }
-
-    drawPiece(coordinate){
-        let _color = this._pieceOptions.fillColor;
-        util.drawCircle(this._ctx, coordinate, this._radius, _color);
-        console.log("drawPiece: " + coordinate);
+        this._piece.drawPiece(coordinate);
     }
 
     getRelativePosition(coordinate){

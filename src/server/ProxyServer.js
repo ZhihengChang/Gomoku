@@ -1,6 +1,5 @@
 'use strict';
 const fs = require('fs');
-const User = require('./User');
 const config = require('../config/config.json');
 const util = require('./server_utilities');
 const { ClientRequest } = require('http');
@@ -10,6 +9,7 @@ const PSF = {
     login: login,
     signup: signup,
     createGame: createGame,
+    loadGameTable: loadGameTable,
 }
 
 class ProxyServer {
@@ -167,9 +167,22 @@ async function createGame(reqBody, response){
 
     //insert game
     console.log(_result);
-    await _db.delete(_collection, {username: _data.username});
+    // await _db.delete(_collection, {username: _data.username});
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
-    console.log("game response end!")
+}
+
+async function loadGameTable(reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
+    let _data = reqBody.data; //{}, should be criteria
+    // let _user = reqBody.user;
+    let _action = reqBody.action;
+    
+    let _matches = await _db.select(_collection); 
+    console.log(typeof _matches);
+    console.log(_matches);
+    await _db.delete(_collection);
+    util.sendJsonResponse(response, _action, 200, 'SUCCESS', _matches);
 }
 
 module.exports = { ProxyServer };

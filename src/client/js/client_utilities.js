@@ -1,11 +1,12 @@
 //Client Utilities
 'use strict';
+
 export {
-    setAttrs, createDom, createMultiDoms, addDom, 
-    createTableRow, 
+    setAttrs, createDom, createMultiDoms, addDom, clearPage,
+    createTableRow, clearAllRows,
     generateReqBody, generatePOSTReq,
     hideDom, showDom, displayMsg,
-    isEmpty
+    getPlayerLevel, isEmpty
 };
 
 // general ###################################################################
@@ -122,6 +123,14 @@ function displayMsg(elem, msg, color){
     });
 }
 
+/**
+ * Clear all page content
+ */
+function clearPage(page) {
+    let content = page.div_main;
+    content.parentNode.removeChild(content);
+}
+
 // gtable ####################################################################
 
 /**
@@ -142,7 +151,20 @@ function createTableRow(info, fn) {
         }
         addDom(_row, _cell);
     }
-    return _row;
+
+    //add two btns
+    return addDom(_row,
+        addDom(createDom('td', { class: 'action' }), 
+            createDom('button', { class: 'btn join', txt: 'Join' }),
+            createDom('button', { class: 'btn spec', txt: 'Spectate' })
+        )
+    );
+}
+
+function clearAllRows(tablePart){
+    while (tablePart.firstChild) {
+        tablePart.removeChild(tablePart.firstChild);
+    }
 }
 
 // fetch ####################################################################
@@ -178,6 +200,13 @@ function generatePOSTReq(reqBody, contentType){
     }
 }
 
+
+
+// User #####################################################################
+
+function getPlayerLevel(playerExp){
+    return 1 + Math.floor(playerExp / 10);
+}
 
 // Other ####################################################################
 
