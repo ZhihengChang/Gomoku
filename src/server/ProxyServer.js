@@ -6,10 +6,13 @@ const { ClientRequest } = require('http');
 const JWT_HEADER = '{"alg":"HS256","typ":"JWT"}';
 
 const PSF = {
-    login: login,
-    signup: signup,
-    createGame: createGame,
-    loadGameTable: loadGameTable,
+    login:          login,
+    signup:         signup,
+    createGame:     createGame,
+    loadGameTable:  loadGameTable,
+    joinGame:       joinGame,
+    deleteGame:     deleteGame,
+    getGameOptions: getGameOptions,
 }
 
 class ProxyServer {
@@ -57,6 +60,12 @@ class ProxyServer {
     }
 }
 
+/**
+ * Handle sign up action
+ * Create and insert new user based on reqBody data
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
 async function signup(reqBody, response) {
     let _db = this;
     let _collection = 'users'
@@ -96,6 +105,13 @@ async function signup(reqBody, response) {
     });
 }
 
+/**
+ * Handle login action
+ * Validate user input username and password
+ * if match return user otherwise return error message
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
 async function login(reqBody, response) {
     let _db = this;
     let _collection = 'users';
@@ -104,7 +120,8 @@ async function login(reqBody, response) {
 
     let _username = _data.username;
     let _password = _data.password;
-    let _result = await _db.select(_collection, { username: _username });
+    let _selectQuery = { username: _username };
+    let _result = await _db.select(_collection, _selectQuery);
     let _user = _result[0];
     console.log(_user);
     if (util.isEmpty(_user) || _password != _user.password) {
@@ -124,11 +141,17 @@ async function login(reqBody, response) {
     let _authToken = util.createBase64JWT(JWT_HEADER, _payload, _user.password);
     _user.authToken = _authToken;
 
-    // let _updateQuery = {$set: {lastLogin: _loginTime, authToken: _authToken}};
-    let result = await _db.replace(_collection, { username: _username }, _user);
+    let result = await _db.replace(_collection, _selectQuery, _user);
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _user);
 }
 
+/**
+ * Handle create game action
+ * Create and insert new match based on game options (reqBody data)
+ * if there is no duplicate match return match otherwise return error message
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
 async function createGame(reqBody, response){
     let _db = this;
     let _collection = 'matches';
@@ -137,7 +160,7 @@ async function createGame(reqBody, response){
     let _action = reqBody.action;
     
     //check duplicate
-    let _duplicates = await _db.select(_collection, { username: _user.username});
+    let _duplicates = await _db.select(_collection, { playerUsername: _user.username});
     if (!util.isEmpty(_duplicates)) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
             message: 'Unable to Create Game: error: player already in game.',
@@ -171,6 +194,13 @@ async function createGame(reqBody, response){
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
 }
 
+/**
+ * Handle load game table action
+ * select matches from 'matches' collection based on the criteria
+ * return match array (empty array [] is returned when no match in the collection)
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
 async function loadGameTable(reqBody, response){
     let _db = this;
     let _collection = 'matches';
@@ -181,8 +211,96 @@ async function loadGameTable(reqBody, response){
     let _matches = await _db.select(_collection); 
     console.log(typeof _matches);
     console.log(_matches);
-    await _db.delete(_collection);
+    // await _db.delete(_collection);
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _matches);
+}
+
+/**
+ * Handle join game action
+ * update the match object
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
+async function joinGame(reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
+    let _user = reqBody.user;
+    let _matchInfo = reqBody.data;
+    let _action = reqBody.action;
+
+    let _selectQuery = { playerUsername: _matchInfo.player };
+    let _matchArray = await _db.select(_collection, _selectQuery); 
+    let _match = _matchArray[0];
+    
+    //check match existence 
+    if(util.isEmpty(_match)){
+        util.sendJsonResponse(response, _action, 404, 'ERROR', {
+            message: 'Unable to Join the Game: error: Game Not Found.',
+        });
+        return;
+    }
+
+    //check join own game
+    if(_match.playerUsername == _user.username){
+        util.sendJsonResponse(response, _action, 400, 'ERROR', {
+            message: 'Unable to Join the Game: error: Join the Game You Created.',
+        });
+        return;
+    }
+    
+    //update match
+    _match.status = 'In Game';
+    _match.opponent = _user.username;
+    _match.timestamp = new Date();
+    let _result = await _db.replace(_collection, _selectQuery, _match);
+    console.log(_result);
+
+    util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
+    await _db.delete(_collection);
+
+}
+
+/**
+ * 
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
+async function deleteGame(reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
+    let _match = reqBody.data;
+    let _user = reqBody.user;
+    let _action = reqBody.action;
+
+    let _selectQuery = { matchId: _match.matchId };
+    let _result = await _db.delete(_collection, _selectQuery);
+    console.log(_result);
+
+    util.sendJsonResponse(response, _action, 200, 'SUCCESS');
+}
+
+/**
+ * 
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
+async function getGameOptions(reqBody, response){
+    let _db = this;
+    let _collection = 'userOptions';
+    let _user = reqBody.user;
+    let _action = reqBody.action;
+
+    let _selectQuery = { userId: _user.userId };
+    let _result = await _db.select(_collection, _selectQuery);
+    console.log(_result);
+    if(util.isEmpty(_result)){
+        //use default options
+        let _defaultGameOptions = config.options.game;
+        util.sendJsonResponse(response, _action, 200, 'SUCCESS', _defaultGameOptions);
+        return;
+    }
+
+    //return user game options
 }
 
 module.exports = { ProxyServer };

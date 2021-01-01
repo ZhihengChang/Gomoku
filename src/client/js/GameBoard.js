@@ -11,8 +11,8 @@ export default class GameBoard{
     _lineLength; //the inner border line length.
 
     _stepQueue; //step (coordinates) array.
-    _firstTask; //stepQueue drawing process thread 1
-    _secondTask; //stepQueue drawing process thread 2
+    // _firstTask; //stepQueue drawing process thread 1
+    // _secondTask; //stepQueue drawing process thread 2
 
     /**
      * create GameBoard object
@@ -34,8 +34,8 @@ export default class GameBoard{
         this._pieceOptions = options.piece;
 
         this._stepQueue = [];
-        this._firstTask = false;
-        this._secondTask = false;
+        // this._firstTask = false;
+        // this._secondTask = false;
     }
  
     draw(){
@@ -47,25 +47,29 @@ export default class GameBoard{
     drawStepQueue(){
         if (this._stepQueue.length == 0) return;
 
-        let _maxSteps = 10;
-        let _totalSteps =  this._stepQueue.length;
+        // let _maxSteps = 10;
+        // let _totalSteps =  this._stepQueue.length;
 
-        if ( _totalSteps >= _maxSteps ) {
+        // if ( _totalSteps >= _maxSteps ) {
             
-            if(this._firstTask) {clearTimeout(this._firstTask)};
-            this._firstTask = setTimeout(() => {
-                Array.from(this._stepQueue.slice(1, Math.floor(_totalSteps/2)))
-                        .forEach(_step => this.drawStep(_step, true));
-            });
+        //     if(this._firstTask) {clearTimeout(this._firstTask)};
+        //     this._firstTask = setTimeout(() => {
+        //         Array.from(this._stepQueue.slice(1, Math.floor(_totalSteps/2)))
+        //                 .forEach(_step => {this.drawStep(_step, true);
+        //                     console.log('1');
+        //                 });
+        //     });
             
-            if(this._secondTask) {clearTimeout(this._secondTask)};
-            this._secondTask = setTimeout(() => {
-                Array.from(this._stepQueue.slice(Math.floor(_totalSteps/2), _totalSteps))
-                        .forEach(_step => this.drawStep(_step, true));
-            });
+        //     if(this._secondTask) {clearTimeout(this._secondTask)};
+        //     this._secondTask = setTimeout(() => {
+        //         Array.from(this._stepQueue.slice(Math.floor(_totalSteps/2), _totalSteps))
+        //                 .forEach(_step => {this.drawStep(_step, true);
+        //                     console.log('2');
+        //                 });
+        //     });
 
-            return;
-        };
+        //     return;
+        // };
 
         this._stepQueue.forEach(_step => this.drawStep(_step, true));
     }

@@ -3,7 +3,7 @@
 
 export {
     setAttrs, createDom, createMultiDoms, addDom, clearPage,
-    createTableRow, clearAllRows,
+    createTableRow, getMatchInfo, clearAllRows,
     generateReqBody, generatePOSTReq,
     hideDom, showDom, displayMsg,
     getPlayerLevel, isEmpty
@@ -159,6 +159,20 @@ function createTableRow(info, fn) {
             createDom('button', { class: 'btn spec', txt: 'Spectate' })
         )
     );
+}
+
+/**
+ * get the corresponding table row for the botton (join/spec) 
+ * @param {HTMLElement} btn 
+ */
+function getMatchInfo(btn){
+    let _actionCell = btn.parentNode;
+    let _row = _actionCell.parentNode;
+    let _matchInfo = {};
+    for(let _cell of _row.childNodes){
+        _matchInfo[_cell.dataset.key] = _cell.textContent;
+    }
+    return _matchInfo;
 }
 
 function clearAllRows(tablePart){

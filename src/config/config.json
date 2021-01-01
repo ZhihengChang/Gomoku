@@ -4,6 +4,24 @@
         "dbType": "Mongodb"
     },
 
+    "options": {
+        "game": {
+            "gameBoard": {
+                "size": 14,
+                "edge": 3,
+                "lineColor": "black",
+                "edgeColor": "black",
+                "backgroundColor": "rgb(204, 147, 82)"
+            },
+
+            "piece": {
+                "radius": 20,
+                "lineColor": "black",
+                "fillColor": "white"
+            }
+        }
+    },
+
     "Mongodb": {
         "api": "MongoApi.js",
         "host": "localhost",

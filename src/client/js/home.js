@@ -5,10 +5,12 @@ import { createPage } from './createPage.js';
 
 
 var CUR_PAGE;
+var WIN_GAME;
 
 var MIN_SIZE = 14;
 var MAX_SIZE = 19;
 
+var MATCH;
 var USER = JSON.parse(localStorage.user);
 
 window.onload = () => {
@@ -23,10 +25,19 @@ window.onload = () => {
 
     menu.btn_create.addEventListener('click', loadCreateGamePageHandler);
 
+    menu.btn_home.click(); //need pulling to replace: load matches for gtable
+
 }
 
 document.addEventListener("DOMContentLoaded", domContentLoadedHandler);
 window.addEventListener("unload", pageUnloadHandler);
+window.addEventListener("message", (event) => {
+    console.log('recived message: ', event.data);
+    WIN_GAME.postMessage(JSON.stringify({ 
+        user: USER, 
+        match: MATCH
+    }), location.origin);
+});
 
 
 //#### Event handlers ###########################################################################
@@ -36,13 +47,14 @@ window.addEventListener("unload", pageUnloadHandler);
  * NOTE: menu 'Home' btn onclick
  */
 function loadHomePageHandler() {
+    console.log('load home page ...')
     util.clearPage(CUR_PAGE);
     let _homePage = createPage.home();
     CUR_PAGE = _homePage;
     util.addDom(document.body, _homePage.div_main);
 
     loadGameTable.call(_homePage.display);
-    //add listener to join and spec
+    //disable all join when USER is in game
 
 }
 
@@ -87,7 +99,8 @@ function loadCreateGamePageHandler() {
  * NOTE: Create btn onclick function
  */
 async function createGameHandler() {
-    const win = window.open('about:blank');
+    WIN_GAME = window.open('about:blank');
+    WIN_GAME.blur();
 
     let _menu = this.menu;
     let _display = this.display;
@@ -106,14 +119,16 @@ async function createGameHandler() {
     let _response = await _res.json();
 
     if(_response.status == 'ERROR'){
-        alert(_response.data.message);
+        WIN_GAME.close();
+        setTimeout(()=>{alert(_response.data.message)});
         return;
     }
-
-    localStorage.match = JSON.stringify(_response.data);
+    
+    MATCH = _response.data;
 
     //new window
-    win.location = `${location.origin}/pages/game.html`;
+    WIN_GAME.location = `${location.origin}/pages/game.html`;
+
     _menu.btn_home.click();
 }
 
@@ -155,9 +170,31 @@ function sizeChangeHandler(delta) {
     p_size.textContent = `${_size} X ${_size}`;
 }
 
+/**
+ * Handle 'join' btn and 'spec' btn
+ * @param {*} event 
+ */
+function actionsHandler(event){
+    let _gtable = this;
+    event = event || window.event;
+    // event.target = event.target || event.srcElement;
 
-function actionsHandler(){
-    
+    let element = event.target;
+
+    if (element.nodeName === "BUTTON") {
+        if (/join/.test(element.className)){
+            //handle join
+            let _matchInfo = util.getMatchInfo(element);
+            // console.log(_matchInfo);
+            handleJoin(_matchInfo);
+        }
+        
+        else if (/spec/.test(element.className)){
+            //handle spec
+            alert('spec the game');
+            handleSpec();
+        }
+    }
 }
 
 
@@ -173,11 +210,32 @@ function loadDefaultPage() {
     util.addDom(document.body, CUR_PAGE.div_main);
 }
 
+async function handleJoin(matchInfo){
+    WIN_GAME = window.open('about:blank');
+    
+    let _action = 'joinGame';
+    let _reqBody = util.generateReqBody(_action, USER, matchInfo);
+    let _request = util.generatePOSTReq(_reqBody);
+    let _res = await fetch(`/${_action}`, _request);
+    let _response = await _res.json();
+    console.log(_response);
+
+    if(_response.status == 'ERROR'){
+        WIN_GAME.close();
+        setTimeout(()=>{alert(_response.data.message)});
+        return;
+    }
+
+    MATCH = _response.data;
+    WIN_GAME.location = `${location.origin}/pages/game.html`;
+}
+
 /**
  * list all matches in the matches collection (db) on the home: gtable
  * ISSUE: when there are too many games (rows)
  */
 async function loadGameTable(){
+    console.log('load game table ...')
     let _gtable = this;
     util.clearAllRows(_gtable.tbd_gtable_body);
 
@@ -205,7 +263,7 @@ async function loadGameTable(){
         util.addDom(_gtable.tbd_gtable_body, _row);
     }
 
-    _gtable.tbd_gtable_body.addEventListener('click', actionsHandler.bind(_gtable));
+    _gtable.tbd_gtable_body.onclick = actionsHandler.bind(_gtable);
 }
 
 /**
