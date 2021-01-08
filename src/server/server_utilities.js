@@ -6,7 +6,7 @@ const CryptoJS = require('crypto-js');
 
 module.exports = {
     loadPage, getContentType, 
-    getRequestBody, sendJsonResponse, 
+    getRequestBody, sendJsonResponse, sendWSResponse,
     createBase64JWT,
     isEmpty,
 };
@@ -97,6 +97,22 @@ function sendJsonResponse(response, event, code, status, data){
     response.write(JSON.stringify(_res));
     response.end();
 }
+
+/**
+ * send ws response through given web socket
+ * @param {websocket} socket 
+ * @param {string} message 
+ * @param {object} data 
+ */
+function sendWSResponse(socket, message, data){
+    let _data = data || {};
+    socket.send(JSON.stringify({
+        message: message,
+        data: _data,
+    }));
+}
+
+//#### other functions ##########################################################################
 
 /**
  * Check the given object/array/map/set is empty

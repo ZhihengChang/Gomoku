@@ -4,9 +4,9 @@
 export {
     setAttrs, createDom, createMultiDoms, addDom, clearPage,
     createTableRow, getMatchInfo, clearAllRows,
-    generateReqBody, generatePOSTReq,
+    generateReqBody, generatePOSTReq, sendWSRequest,
     hideDom, showDom, displayMsg,
-    getPlayerLevel, isEmpty
+    getPlayerLevel, getPlayerRank, isEmpty
 };
 
 // general ###################################################################
@@ -172,6 +172,7 @@ function getMatchInfo(btn){
     for(let _cell of _row.childNodes){
         _matchInfo[_cell.dataset.key] = _cell.textContent;
     }
+    console.log(_matchInfo);
     return _matchInfo;
 }
 
@@ -181,7 +182,7 @@ function clearAllRows(tablePart){
     }
 }
 
-// fetch ####################################################################
+// communication ##############################################################
 
 /**
  * returns a request body that contains 
@@ -214,12 +215,33 @@ function generatePOSTReq(reqBody, contentType){
     }
 }
 
+function sendWSRequest(socket, action, user, data){
+    let _request = generateReqBody(action, user, data);
+    socket.send(JSON.stringify(_request));
+}
 
 
 // User #####################################################################
 
 function getPlayerLevel(playerExp){
     return 1 + Math.floor(playerExp / 10);
+}
+
+function getPlayerRank(playerRankPoints){
+    let rank = Math.floor(playerRankPoints / 100);
+    switch(rank){
+        case 0 : return 'BRONZE';
+        case 1 : return 'SILVER';
+        case 2 : return 'GOLD';
+        case 3 : return 'PLATINUM';
+        case 4 : return 'DIAMOND';
+        case 5 : return 'MASTER';
+        default: return 'SUPREME';
+    }
+}
+
+function getPlayerWinrate(){
+    return (this._user.totalWins / this._user.totalMatches) * 100;
 }
 
 // Other ####################################################################

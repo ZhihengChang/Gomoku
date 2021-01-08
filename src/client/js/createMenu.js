@@ -64,7 +64,7 @@ function createMenu_game() {
         div_menu: util.createDom('div', { class: 'menu container' }),
         btn_undo: util.createDom('button', { class: 'btn menubtn undo_button', txt: 'Undo' }),
         btn_surrender: util.createDom('button', { class: 'btn menubtn sdr_button f11', txt: 'Surrender' }),
-        btn_settings: util.createDom('button', { class: 'btn menubtn st_button', txt: 'Setting' }),
+        // btn_settings: util.createDom('button', { class: 'btn menubtn st_button', txt: 'Setting' }),
     };
     util.addDom(gameMenu.div_menu, gameMenu.btn_undo, gameMenu.btn_surrender, gameMenu.btn_settings);
     return gameMenu;

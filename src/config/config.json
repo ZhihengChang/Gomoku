@@ -1,14 +1,32 @@
 {
     "service": {
         "port": 3000,
-        "dbType": "Mongodb"
+        "dbType": "Mongodb",
+        "dbCollections": {
+            "user": {
+                "startId": 1000,
+                "name": "users"
+            }, 
+            "game": {
+                "startId": 1,
+                "name": "matches"
+            },
+            "setting": {
+                "startId": 1,
+                "name": "userOptions"
+            }
+        },
+        "JWT_HEADER": {
+            "alg":"HS256",
+            "typ":"JWT"
+        }
     },
 
     "options": {
         "game": {
             "gameBoard": {
                 "size": 14,
-                "edge": 3,
+                "edge": 3.5,
                 "lineColor": "black",
                 "edgeColor": "black",
                 "backgroundColor": "rgb(204, 147, 82)"

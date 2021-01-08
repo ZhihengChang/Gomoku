@@ -147,7 +147,8 @@ function createDisplay_gameTable() {
             tr_head: util.createDom('tr', { class: 'row head' }),
             tr_foot: util.createDom('tr', { class: 'row foot' }),
             //Table colums
-            th_id: util.createDom('th', { txt: 'Player' }),
+            th_id: util.createDom('th', { txt: 'ID' }),
+            th_player: util.createDom('th', { txt: 'Player' }),
             th_level: util.createDom('th', { txt: 'LV' }),
             th_status: util.createDom('th', { txt: 'Status' }),
             th_undo: util.createDom('th', { txt: 'Undo' }),
@@ -157,9 +158,9 @@ function createDisplay_gameTable() {
             th_action: util.createDom('th', { txt: 'Actions' })
         }
         util.addDom(gameTable.tr_head,
-            gameTable.th_id, gameTable.th_level, gameTable.th_status,
-            gameTable.th_undo, gameTable.th_chat, gameTable.th_size,
-            gameTable.th_spect, gameTable.th_action,
+            gameTable.th_id, gameTable.th_player, gameTable.th_level, 
+            gameTable.th_status, gameTable.th_undo, gameTable.th_chat, 
+            gameTable.th_size, gameTable.th_spect, gameTable.th_action,
         );
         util.addDom(gameTable.thd_gtable_head, gameTable.tr_head);
         util.addDom(gameTable.tft_gtable_foot, gameTable.tr_foot);
@@ -289,17 +290,37 @@ function createDisplay_inGame() {
     let game = {
         div_display: util.createDom('div', { class: 'ingame container' }),
         div_game: util.createDom('div', { class: 'game container' }),
-        div_chat: util.createDom('div', { class: 'chat container' }),
+        div_tabs: util.createDom('div', { class: 'tab container' }),
+        div_tab_btns: util.createDom('div', { class: 'tabbtns container' }),
+        div_tab_cont: util.createDom('div', { class: 'tabcont container' }),
         div_statbar: util.createDom('div', { class: 'statbar container' }),
 
+        //right div
         p_state: util.createDom('p', { class: 'stat f23', txt: 'waiting...' }),
         p_countdown: util.createDom('p', { class: 'stat f23', txt: '1:00' }),
         p_time: util.createDom('p', { class: 'stat f23', txt: '00:00' }),
         canvas_gameboard: util.createDom('canvas', { class: 'gameboard' }),
 
+        //left div
+        btn_chat: util.createDom('button', { class: 'tablinks', txt: 'chat' }),
+        btn_setting: util.createDom('button', { class: 'tablinks', txt: 'setting' }),
+
+        div_chat: util.createDom('div', { class: 'container tabcontent chat' }),
+        div_setting: util.createDom('div', { class: 'container tabcontent setting' }),
+
     };
     util.addDom(game.div_statbar, game.p_state, game.p_countdown, game.p_time);
     util.addDom(game.div_game, game.div_statbar, game.canvas_gameboard);
-    util.addDom(game.div_display, game.div_game, game.div_chat);
+    util.addDom(game.div_tab_btns, game.btn_chat, game.btn_setting);
+    util.addDom(game.div_tab_cont, game.div_chat, game.div_setting);
+    util.addDom(game.div_tabs, game.div_tab_btns, game.div_tab_cont);
+    
+    util.hideDom(game.div_chat);
+    util.hideDom(game.div_setting);
+    
+    util.addDom(game.div_display, 
+        game.div_game, game.div_tabs,
+        // game.div_chat, game.div_setting,
+    );
     return game;
 }

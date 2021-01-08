@@ -1,8 +1,9 @@
 'use strict';
+const fs = require('fs');
 const config = require('../config/config.json');
 const util = require('./server_utilities');
 const GameController = require('./GameController');
-// const JWT_HEADER = '{"alg":"HS256","typ":"JWT"}';
+const JWT_HEADER = '{"alg":"HS256","typ":"JWT"}';
 
 //game[] = [game1, game2, ...]
 
@@ -19,8 +20,7 @@ const PSF = {
     getGameOptions: getGameOptions,
     
     //ws
-    newRoom: newRoom,
-    addPlayerToRoom: addPlayerToRoom,
+    // newRoom: newRoom,
 }
 
 class ProxyServer {
@@ -28,35 +28,35 @@ class ProxyServer {
     constructor(dbApi) {
         this._dbApi = dbApi;
         this._gameController = new GameController(dbApi);
-        console.log('ProxyServer Started');
+        console.log('GameController:', this._gameController);
     }
 
     takeAction(reqBody, response) {
         let func = PSF[reqBody.action];
         if (func) {
-            func.call(this._gameController, reqBody, response);
+            func.call(this._dbApi, this._gameController, reqBody, response);
         }
     }
 
     handle_http_requests(request, response) {
 
-        console.log('> Handle HTTP Request:', request.url);
+        console.log(request.url);
         util.loadPage(request, response);
 
         if (request.method === 'POST') {
             util.getRequestBody(request, reqBody => {
                 this.takeAction(reqBody, response);
-                console.log('> HTTP Request Body:', reqBody);
+                console.log(reqBody);
             })
         }
     }
 
     handle_wss_requests(wsServer, request, socket, head) {
-        console.log("> Handle WS Request:", request.url)
+        console.log("wss:", request.url)
         wsServer.handleUpgrade(request, socket, head, (ws) => {
             ws.on('message', (req) => {
                 let wsRequest = JSON.parse(req);
-                console.log('> WS Request:', wsRequest);
+                console.log('handle wss request:', wsRequest);
                 this.takeAction(wsRequest, ws);
             });
 
@@ -75,21 +75,41 @@ class ProxyServer {
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function signup(reqBody, response) {
-    let _gameController = this;
+async function signup(gameController, reqBody, response) {
+    let _db = this;
+    let _collection = 'users'
     let _data = reqBody.data;
     let _action = reqBody.action;
 
-    let _user = await _gameController.getUserByUsername(_data.username);
-    if (_user) {
+    let _result = await _db.select(_collection, { username: _data.username });
+    if (!util.isEmpty(_result)) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
             message: 'Username entered already exists.'
         });
         return;
     }
 
-    await _gameController.createUser(_data);
+    let id = 1000 + await _db.count(_collection);
+    _result = await _db.insert(_collection, {
+        userId: id,
+        username:       _data.username,
+        email:          _data.email,
+        birthday:       _data.birthday,
+        password:       _data.password,
+        exp:            0,
+        totalWins:      0,
+        totalMatches:   0,
+        rankPoints:     0,
+        signature:      null,
+        // status:         'offline',
+        lastLogin:      new Date(0),
+        logOffTime:     new Date(0),
+        signupDate:     new Date(),
+        authToken:      null,
+    });
 
+    console.log(_result);
+    //await _db.delete(_collection, {username: _data.username});
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', {
         message: 'Sign up successful! Back to login.'
     });
@@ -102,16 +122,19 @@ async function signup(reqBody, response) {
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function login(reqBody, response) {
-    let _gameController = this;
+async function login(gameController, reqBody, response) {
+    let _db = this;
+    let _collection = 'users';
     let _data = reqBody.data;
     let _action = reqBody.action;
 
     let _username = _data.username;
     let _password = _data.password;
-
-    let _user = await _gameController.getUserByUsername(_username);
-    if (!_user || _password != _user.password) {
+    let _selectQuery = { username: _username };
+    let _result = await _db.select(_collection, _selectQuery);
+    let _user = _result[0];
+    console.log(_user);
+    if (util.isEmpty(_user) || _password != _user.password) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
             message: 'Username or password is incorrect.'
         });
@@ -120,17 +143,17 @@ async function login(reqBody, response) {
 
     // _user.status = 'online';
     let _loginTime = new Date();
-    let _authToken = util.createBase64JWT(config.service.JWT_HEADER, JSON.stringify({
+    _user.lastLogin = _loginTime;
+    let _payload = JSON.stringify({
         id:         _user.userId,
         username:   _username,
         ts:         _loginTime.getTime(),
-    }), _user.password);
-
+    });
+    let _authToken = util.createBase64JWT(JWT_HEADER, _payload, _user.password);
     _user.authToken = _authToken;
-    _user.lastLogin = _loginTime;
 
-    await _gameController.updateUser(_user.userId, _user);
-
+    await _db.replace(_collection, _selectQuery, _user);
+    // util.sendJsonResponse(response, _action, 200, 'SUCCESS', _user);
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', {
         userId:     _user.userId,
         username:   _user.username,
@@ -145,25 +168,45 @@ async function login(reqBody, response) {
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function createGame(reqBody, response){
-
-    let _gameController = this;
-    let _username = reqBody.user.username;
+async function createGame(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
     let _data = reqBody.data;
+    let _user = reqBody.user;
     let _action = reqBody.action;
     
     //check duplicate
-    let _duplicateMatch = await _gameController.getMatchByPlayer(_username);
-    if (_duplicateMatch) {
+    let _duplicates = await _db.select(_collection, { playerName: _user.username});
+    if (!util.isEmpty(_duplicates)) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
             message: 'Unable to Create Game: error: player already in game.',
         });
         return;
     }
 
-    let _user = await _gameController.getUserByUsername(_username);
-    let _match = await _gameController.createMatch(_user, _data);
+    let _matchId = await _db.count(_collection); //starts from 0
+    let _match = {
+        matchId:            _matchId,
+        playerId:           _user.userId,
+        playerName:         _user.username,
+        playerExp:          _user.exp,
+        status:             'Waiting',
+        opponent:           null,
+        boardSize:          _data.boardSize,
+        undo:               _data.undo,
+        chat:               _data.chat,
+        spectate:           _data.spectate,
+        spectating:         0,
+        stepsQueue:         [],
+        matchWinner:        null,
+        matchTime:          null,
+        timestamp:          new Date(),
+    };
+    let _result = await _db.insert(_collection, _match);
 
+    //insert game
+    console.log(_result);
+    // await _db.delete(_collection, {username: _data.username});
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
 }
 
@@ -174,12 +217,17 @@ async function createGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function loadGameTable(reqBody, response){
-    let _gameController = this;
+async function loadGameTable(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
     let _data = reqBody.data; //{}, should be criteria
+    // let _user = reqBody.user;
     let _action = reqBody.action;
     
-    let _matches = await _gameController.getMatch();
+    let _matches = await _db.select(_collection); 
+    console.log(typeof _matches);
+    console.log(_matches);
+    // await _db.delete(_collection);
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _matches);
 }
 
@@ -189,13 +237,15 @@ async function loadGameTable(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function joinGame(reqBody, response){
-    let _gameController = this;
+async function joinGame(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
     let _user = reqBody.user;
-    let _matchId = reqBody.data.id;
+    let _matchInfo = reqBody.data;
     let _action = reqBody.action;
 
-    let _match = await _gameController.getMatchById(+_matchId);
+    let _match = await gameController.getMatch(+_matchInfo.id);
+    console.log('match', _match);
     
     //check match existence 
     if(!_match){
@@ -217,10 +267,11 @@ async function joinGame(reqBody, response){
     _match.status = 'In Game';
     _match.opponent = _user.username;
     _match.timestamp = new Date();
-    let _result = await _gameController.updateMatch(+_matchId, _match);
+    let _result = await gameController.updateMatch(+_matchInfo.id, _match);
+    console.log(_result);
 
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
-    // await _gameController.deleteMatch(+_matchId);
+    await gameController.deleteMatch(+_matchInfo.id);
 
 }
 
@@ -229,13 +280,17 @@ async function joinGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function deleteGame(reqBody, response){
-    let _gameController = this;
+async function deleteGame(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'matches';
     let _match = reqBody.data;
     let _user = reqBody.user;
     let _action = reqBody.action;
 
-    await _gameController.deleteMatch(_match.matchId)
+    let _selectQuery = { matchId: _match.matchId };
+    let _result = await _db.delete(_collection, _selectQuery);
+    console.log(_result);
+
     util.sendJsonResponse(response, _action, 200, 'SUCCESS');
 }
 
@@ -245,22 +300,27 @@ async function deleteGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function getUser(reqBody, response){
-    let _gameController = this;
+async function getUser(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'users';
+    let _user = reqBody.user;
     let _data = reqBody.data;
     let _action = reqBody.action;
-    let _userId = (!util.isEmpty(_data))? _data.userId: reqBody.user.userId;
+
+    let _selectQuery = { userId: _user.userId };
+    if(util.isEmpty(reqBody.data)){
+        _selectQuery = { userId: _data.userId };
+    } 
     
-
-    let _user = await _gameController.getUserById(_userId);
-
-    if (!_user) {
+    let _result = await _db.select(_collection, _selectQuery);
+    if (util.isEmpty(_result)) {
         util.sendJsonResponse(response, _action, 404, 'ERROR', {
             message: 'Error: User Not Found.'
         });
         return;
     }
 
+    _user = _result[0];
     //security operations
     delete _user.password;
     delete _user.email;
@@ -274,13 +334,16 @@ async function getUser(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function getGameOptions(reqBody, response){
-    let _gameController = this;
+async function getGameOptions(gameController, reqBody, response){
+    let _db = this;
+    let _collection = 'userOptions';
     let _user = reqBody.user;
     let _action = reqBody.action;
 
-    let _userOptions = await _gameController.getOptionsByUserId(_user.userId);
-    if(!_userOptions){
+    let _selectQuery = { userId: _user.userId };
+    let _result = await _db.select(_collection, _selectQuery);
+    console.log(_result);
+    if(util.isEmpty(_result)){
         //use default options
         let _defaultGameOptions = config.options.game;
         util.sendJsonResponse(response, _action, 200, 'SUCCESS', _defaultGameOptions);
@@ -292,38 +355,14 @@ async function getGameOptions(reqBody, response){
 
 //#### websocket functions ######################################################################
 
-async function newRoom(wsRequest, socket){
-    let _gameController = this;
+async function newRoom(gameController, wsRequest, socket){
+    let _db = this;
     let _user = wsRequest.user;
     let _data = wsRequest.data;
 
     //get match
-    let _match = await _gameController.getMatchById(_data.matchId);
-    _gameController.newRoom(_match, socket);
-    // let _room = _gameController.getRoom(_data.matchId);
-
-    util.sendWSResponse(socket, 'Room Created');
-
-}
-
-async function addPlayerToRoom(wsRequest, socket){
-    let _gameController = this;
-    let _user = wsRequest.user;
-    let _matchId = wsRequest.data.matchId;
-
-    //add to room
-    let _match = await _gameController.getMatchById(_matchId);
-    let _isOpponent = (_match.opponent == _user.username)? true: false;
-    _gameController.addPlayerToRoom(_matchId, _user.username, socket, _isOpponent);
-    
-    //notify owner
-    let _room = _gameController.getRoom(_matchId);
-    if(_isOpponent){
-        util.sendWSResponse(_room.owner.socket, 'Opponent Joined');
-    }
-    util.sendWSResponse(socket, 'Room Joined');
-    
-    //handle send to spec
+    let _result = await _db.select(_collection, _selectQuery);
+    this._gameController.newRoom();
 }
 
 

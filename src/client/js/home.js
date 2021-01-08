@@ -1,6 +1,5 @@
 'use strict';
 import * as util from './client_utilities.js';
-import Profile from './Profile.js';
 import { createPage } from './createPage.js';
 
 
@@ -11,11 +10,12 @@ var MIN_SIZE = 14;
 var MAX_SIZE = 19;
 
 var MATCH;
-var USER = JSON.parse(localStorage.user);
+var USER;
+
+CUR_PAGE = createPage.home();
+util.addDom(document.body, CUR_PAGE.div_main);
 
 window.onload = () => {
-
-    loadDefaultPage();
 
     let menu = CUR_PAGE.menu;
 
@@ -25,7 +25,9 @@ window.onload = () => {
 
     menu.btn_create.addEventListener('click', loadCreateGamePageHandler);
 
-    menu.btn_home.click(); //need pulling to replace: load matches for gtable
+    if(localStorage.user) USER = JSON.parse(localStorage.user);
+
+    if(USER) menu.btn_home.click(); //need pulling to replace: load matches for gtable
 
 }
 
@@ -62,17 +64,16 @@ function loadHomePageHandler() {
  * load User Profile page
  * NOTE: menu 'Profile' btn onclick
  */
-function loadProfilePageHandler() {
+async function loadProfilePageHandler() {
     util.clearPage(CUR_PAGE);
     let _profilePage = createPage.profile();
     CUR_PAGE = _profilePage;
     util.addDom(document.body, _profilePage.div_main);
 
     let _display = _profilePage.display;
-
-    let _profile = new Profile(USER);
-    _profile.loadProfile(_display);
-
+    let _userdata = await getUserData(USER.userId);
+    console.log(_userdata);
+    loadProfile(_display, _userdata);
 }
 
 /**
@@ -140,6 +141,7 @@ function domContentLoadedHandler() {
     let _authToken = localStorage.authToken;
     console.log("auth token:" + _authToken);
     if (!_authToken) {
+        console.log('auth token not found!');
         util.clearPage(CUR_PAGE);
     }
 }
@@ -252,7 +254,8 @@ async function loadGameTable(){
     for(let match of _matches){
         console.log(match);
         let _row = util.createTableRow({
-            player: match.playerUsername,
+            ID: match.matchId,
+            player: match.playerName,
             lv: util.getPlayerLevel(match.playerExp),
             status: match.status,
             undo: match.undo? 'On': 'Off',
@@ -267,6 +270,48 @@ async function loadGameTable(){
 }
 
 /**
+ * get user information of specific user
+ * @param {number} userId 
+ */
+async function getUserData(userId){
+    console.log('get user data ...');
+    
+    let _data;
+    if(userId) _data = { userId };
+    let _action = 'getUser';
+
+    let _reqBody = util.generateReqBody(_action, USER, _data);
+    let _request = util.generatePOSTReq(_reqBody);
+    let _res = await fetch(`/${_action}`, _request);
+    let _response = await _res.json();
+    
+    return _response.data;
+}
+
+/**
+ * load user data into the given profile display
+ * @param {object} profileDisplay 
+ * @param {object} userData 
+ */
+function loadProfile(profileDisplay, userData){
+    //Player level
+    profileDisplay.p_level.textContent += util.getPlayerLevel(userData.exp);
+    //Player username
+    profileDisplay.p_name.textContent = userData.username;
+    //Player ID
+    profileDisplay.p_id.textContent += userData.userId;
+    //Player Birthday
+    profileDisplay.p_birthday.textContent = userData.birthday;
+    //Player Rank
+    profileDisplay.p_rank_value = util.getPlayerRank(userData.rankPoints); 
+    //Player Wins
+    profileDisplay.p_wins_value = userData.totalWins;
+    //Player Winrate
+    let _winrate = (userData.totalWins / userData.totalMatches) * 100;
+    profileDisplay.p_winrate_value = `${_winrate}%`;
+}
+
+/**
  * add table row callback function: set status, switch colors
  * @param {HTMLElement} cell 
  */
@@ -275,16 +320,3 @@ function setTdColor(cell) {
         cell.classList.add(cell.textContent.replace(' ', '_').toLowerCase());
     }
 }
-
-
-//del this
-// console.log(location);
-// let socket = new WebSocket(`ws://${location.host}/chat`);
-// home.menu.btn_profile.addEventListener('click', function () {
-//     socket.send(sessionStorage.user);
-// })
-
-// socket.onmessage = function (event) {
-//     let message = event.data;
-//     alert(message);
-// }

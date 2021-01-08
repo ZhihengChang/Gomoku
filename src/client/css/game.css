@@ -1,7 +1,7 @@
 .main.container {
     height: 100%;
     width: 100%;
-    background-color: rgb(187, 187, 187);
+    background-color: rgb(139, 139, 139);
     grid-template: 100% / var(--menu_width) 1fr;
 }
 
@@ -11,7 +11,7 @@
 
 .game.container{
     grid-template: 4% 96% / 100%;
-    box-shadow: inset -5px 15px 20px #000000;
+    /* box-shadow: inset -5px 15px 20px #000000; */
 }
 
 .statbar.container {
@@ -34,14 +34,61 @@
 }
 
 canvas {
-    margin-left: 1em;
-    margin-right: 1em;
-    box-shadow: 0 0 20px;
+    overflow: hidden;
+    /* box-shadow: 12px 0 15px -4px rgba(31, 31, 31, 0.8), -12px 0 8px -4px rgba(31, 31, 31, 0.8); */
     place-self: start center;
 }
 
-.chat.container{
+.tab.container{
+    overflow: hidden;
+    background-color: rgb(32, 32, 32);
+    grid-template: 4% 96% / 100%;
+    /* box-shadow: 12px 0 15px -4px rgb(5, 5, 5), -12px 0 8px -4px rgb(5, 5, 5); */
+}
+
+.tabbtns.container{
+    grid-template: 100% / repeat(5, 1fr);
+}
+
+.tabcont.container{
     background-color: rgb(32, 32, 32);
 }
+
+  
+  /* Style the buttons inside the tab */
+.tab button {
+    color: white;
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    text-align: center; 
+    transition: 0.3s;
+    font-size: 17px;
+}
+  
+  /* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: rgb(53, 52, 52);
+}
+  
+  /* Create an active/current tablink class */
+.tab button.active {
+
+    background-color: rgb(53, 52, 52);
+}
+  
+  /* Style the tab content */
+.tabcontent {
+    color: white;
+    background-color: rgb(53, 52, 52);
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
+}
+
+
 
 
