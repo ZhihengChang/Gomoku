@@ -3,36 +3,28 @@ import * as util from './client_utilities.js';
 import { createPage } from './createPage.js';
 import GameBoard from './GameBoard.js';
 
-var OPP_FOUND = false;
 var TIMEOUT = false;
 var DELAY = 100;
 var GAMEBOARD;
 var SOCKET;
 
-let INGAME = createPage.inGame();
-let _menu = INGAME.menu;
-let _display = INGAME.display;
-let _canvas = _display.canvas_gameboard;
+var INGAME = createPage.inGame();
 util.addDom(document.body, INGAME.div_main);
-  
-let defaultOpenTab = _display.btn_chat;
-_display.btn_chat.addEventListener('click', openTab);
-_display.btn_setting.addEventListener('click', openTab);
-// menu.btn_undo.addEventListener('click', undoLastStepHandler);
-// menu.btn_surrender.addEventListener('click', surrenderHandler);
 
 document.addEventListener("DOMContentLoaded", domContentLoadedHandler);
 window.addEventListener("unload", pageUnloadHandler);
-// window.addEventListener('resize', gameBoardFitWindow);
 window.addEventListener('resize', redrawGameBoard);
+
 window.addEventListener("message", async (event) => {
+    let _canvas = INGAME.display.canvas_gameboard;
+
     if (event.origin !== location.origin) return;
     let _data = JSON.parse(event.data);
     console.log(_data);
 
     sessionStorage.user = JSON.stringify(_data.user);
     sessionStorage.match = JSON.stringify(_data.match);
-    
+
     let _gameOptions = await getGameOptions(_data.user);
     console.log(_gameOptions);
     _gameOptions.gameBoard.size = _data.match.boardSize;
@@ -40,9 +32,8 @@ window.addEventListener("message", async (event) => {
     redrawGameBoard();
 
     handleInGame();
-});
 
-defaultOpenTab.click();
+});
 
 //#### main functions ############################################################################
 
@@ -51,10 +42,13 @@ defaultOpenTab.click();
  * NOTE: check if the user is owner or joined player
  */
 async function handleInGame(){
+
     let _match = JSON.parse(sessionStorage.match);
     let _user = JSON.parse(sessionStorage.user);
 
     SOCKET = new WebSocket(`ws://${location.host}/game`);
+
+    initSetting();
 
     if(_user.username == _match.playerName){
         //current user is owner
@@ -133,10 +127,12 @@ function startGame(){
 //#### Place Piece functions ######################################################################
 
 function enablePlacePiece(){
+    let _canvas = _display.canvas_gameboard;
     _canvas.addEventListener("mousedown", placePiece, false);
 }
 
 function disablePlacePiece(){
+    let _canvas = _display.canvas_gameboard;
     // For all major browsers, except IE 8 and earlier
     if (_canvas.removeEventListener) {                   
         _canvas.removeEventListener("mousedown", placePiece);
@@ -146,6 +142,7 @@ function disablePlacePiece(){
 }
 
 function placePiece(event){
+    let _canvas = _display.canvas_gameboard;
     let coordinate = getMouseCoordinate(_canvas, event);
     GAMEBOARD.drawStep(coordinate);
 }
@@ -209,6 +206,7 @@ async function deleteGame(match){
  * recreate the game board based on the window size
  */
 function redrawGameBoard(){
+    let _display = INGAME.display;
     let curWidth = _display.div_game.clientWidth;
     let curHeight = _display.div_game.clientHeight - _display.div_statbar.clientHeight;
     GAMEBOARD.setSize(Math.min(curWidth, curHeight));
@@ -231,6 +229,16 @@ async function getGameOptions(user){
     return _response.data;
 }
 
+function initSetting(){
+    let _display = INGAME.display;
+
+    _display.btn_chat.addEventListener('click', openTab);
+    _display.btn_setting.addEventListener('click', openTab);
+    _display.inp_checkbox_black.addEventListener('click', chooseColor);
+    _display.inp_checkbox_white.addEventListener('click', chooseColor);
+    _display.btn_setting.click();
+}
+
 function openTab(event) {
 
     let _tab;
@@ -243,7 +251,6 @@ function openTab(event) {
         if(_content.classList.contains(_tabName)){
             _tab = _content;
         }
-        // console.log(_tabcontent[i].classList);
     }
     let tablinks = document.getElementsByClassName("tablinks");
     console.log(_tabcontent);
@@ -251,8 +258,37 @@ function openTab(event) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     
-    util.showDom(_tab);
-    event.currentTarget.className += " active";
+    util.showDomAsGrid(_tab);
+    event.currentTarget.classList.add('active');
+    // event.currentTarget.className += " active";
+}
+
+function chooseColor(event){
+    let _user = JSON.parse(sessionStorage.user);
+
+    let _display = INGAME.display;
+    let color;
+    let _nameField;
+
+    _display.p_black.textContent = '';
+    _display.p_white.textContent = '';
+
+    if(event.target.classList.contains('white')){
+        color = 'white';
+        _display.inp_checkbox_black.checked = false;
+        _nameField = _display.p_white;
+    }
+
+    if(event.target.classList.contains('black')){
+        color = 'black';
+        _display.inp_checkbox_white.checked = false;
+        _nameField = _display.p_black;
+    }
+  
+    _nameField.textContent = _user.username;
+
+    //send to server;
+    util.sendWSRequest(SOCKET, 'chooseColor', _user, { color });
 }
 
 function gameBoardFitWindow() {

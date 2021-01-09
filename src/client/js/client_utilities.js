@@ -5,7 +5,7 @@ export {
     setAttrs, createDom, createMultiDoms, addDom, clearPage,
     createTableRow, getMatchInfo, clearAllRows,
     generateReqBody, generatePOSTReq, sendWSRequest,
-    hideDom, showDom, displayMsg,
+    hideDom, showDom, showDomAsGrid, displayMsg,
     getPlayerLevel, getPlayerRank, isEmpty
 };
 
@@ -116,6 +116,10 @@ function showDom(elem){
     setAttrs(elem, {style: {display: 'block'}});
 }
 
+function showDomAsGrid(elem){
+    setAttrs(elem, {style: {display: 'grid'}});
+}
+
 function displayMsg(elem, msg, color){
     setAttrs(elem, {
         txt: msg, 
@@ -216,7 +220,9 @@ function generatePOSTReq(reqBody, contentType){
 }
 
 function sendWSRequest(socket, action, user, data){
-    let _request = generateReqBody(action, user, data);
+    let _data = data || {};
+    _data.timestamp = new Date();
+    let _request = generateReqBody(action, user, _data);
     socket.send(JSON.stringify(_request));
 }
 

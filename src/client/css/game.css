@@ -54,8 +54,55 @@ canvas {
     background-color: rgb(32, 32, 32);
 }
 
-  
-  /* Style the buttons inside the tab */
+.tabcontent.container{
+    grid-template: repeat(10, 1fr) / repeat(10, 1fr);
+}
+
+.timer_name {
+    grid-row-start: 1;
+    grid-column-start: span 10;
+    place-self: center center;
+}
+
+.setting_timer {
+    grid-row-start: 2;
+    grid-column-start: span 10;
+    place-self: start center;
+}
+
+.cbox {
+    -webkit-appearance: none;
+    background-color: transparent;
+    padding: 2.5em;
+    border: 5px solid rgb(32, 32, 32);
+    background-color: rgb(78, 78, 78);
+    border-radius: 50%;
+    grid-row-start: 3;
+    place-self: center center;
+}
+
+.cbox.black:checked {
+    background-color: black;
+}
+
+.cbox.white:checked {
+    background-color: white;
+}
+
+.p_black, .p_white {
+    grid-row-start: 4;
+    place-self: center center;
+}
+
+.cbox.black, .p_black {
+    grid-column: 1 / 6;
+}
+
+.cbox.white, .p_white {
+    grid-column: 6 / 11;
+}
+
+/* Style the buttons inside the tab */
 .tab button {
     color: white;
     background-color: inherit;
@@ -69,18 +116,18 @@ canvas {
     font-size: 17px;
 }
   
-  /* Change background color of buttons on hover */
+/* Change background color of buttons on hover */
 .tab button:hover {
     background-color: rgb(53, 52, 52);
 }
   
-  /* Create an active/current tablink class */
+/* Create an active/current tablink class */
 .tab button.active {
 
     background-color: rgb(53, 52, 52);
 }
   
-  /* Style the tab content */
+/* Style the tab content */
 .tabcontent {
     color: white;
     background-color: rgb(53, 52, 52);

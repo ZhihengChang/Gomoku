@@ -305,12 +305,28 @@ function createDisplay_inGame() {
         btn_chat: util.createDom('button', { class: 'tablinks', txt: 'chat' }),
         btn_setting: util.createDom('button', { class: 'tablinks', txt: 'setting' }),
 
-        div_chat: util.createDom('div', { class: 'container tabcontent chat' }),
-        div_setting: util.createDom('div', { class: 'container tabcontent setting' }),
+        div_chat: util.createDom('div', { class: 'chat tabcontent container' }),
+        
+        div_setting: util.createDom('div', { class: 'setting tabcontent container' }),
+        p_timer_name: util.createDom('p', { class: 'timer_name f30', txt: 'Queue Time:' }),
+        p_setting_timer: util.createDom('p', { class: 'setting_timer f30', txt: '00:00' }),
+
+        p_black: util.createDom('p', { class: 'p_black', txt: '' }),
+        inp_checkbox_black: util.createDom('input', { type: 'checkbox', class: 'cbox black' }),
+        p_white: util.createDom('p', { class: 'p_white', txt: '' }),
+        inp_checkbox_white: util.createDom('input', { type: 'checkbox', class: 'cbox white' }),
+
 
     };
     util.addDom(game.div_statbar, game.p_state, game.p_countdown, game.p_time);
     util.addDom(game.div_game, game.div_statbar, game.canvas_gameboard);
+
+    util.addDom(game.div_setting, 
+        game.p_timer_name, game.p_setting_timer,
+        game.inp_checkbox_black, game.inp_checkbox_white,
+        game.p_black, game.p_white,
+    );
+
     util.addDom(game.div_tab_btns, game.btn_chat, game.btn_setting);
     util.addDom(game.div_tab_cont, game.div_chat, game.div_setting);
     util.addDom(game.div_tabs, game.div_tab_btns, game.div_tab_cont);
