@@ -23,21 +23,21 @@ class GameController {
 
         let _id = await this.generateId(_collection);
         let _result = await this._dbApi.insert(_collection.name, {
-            userId: _id,
-            username: data.username,
-            email: data.email,
-            birthday: data.birthday,
-            password: data.password,
-            exp: 0,
-            totalWins: 0,
-            totalMatches: 0,
-            rankPoints: 0,
-            signature: null,
-            // status:         'offline',
-            lastLogin: new Date(0),
-            logOffTime: new Date(0),
-            signupDate: new Date(),
-            authToken: null,
+            userId:         _id,
+            username:       data.username,
+            email:          data.email,
+            birthday:       data.birthday,
+            password:       data.password,
+            exp:            0,
+            totalWins:      0,
+            totalMatches:   0,
+            rankPoints:     0,
+            signature:      null,
+            status:         'offline',
+            loginTime:      new Date(0),
+            logoutTime:     null,
+            signupDate:     new Date(),
+            authToken:      null,
         });
         console.log(`* User Created: ${_result.result.ok}`);
     }
@@ -104,35 +104,43 @@ class GameController {
         console.log(`* Creating Match: ${JSON.stringify(data)}`);
         let _collection = this._collections.game;
 
-        let _id = await this.generateId(_collection);
+        let _id = _collection.startId;
+        let _latestMatch = await this.getMatchByTs(-1, 1);
+        if(_latestMatch.length > 0){
+            _id = _latestMatch[0].matchId + 1;
+        }
+
         let _match = {
-            matchId: _id,
-            playerId: user.userId,
-            playerName: user.username,
-            playerExp: user.exp,
-            status: 'Waiting',
-            opponent: null,
-            first: null,
-            boardSize: data.boardSize,
-            undo: data.undo,
-            chat: data.chat,
-            spectate: data.spectate,
-            spectating: 0,
-            stepsQueue: [],
-            matchWinner: null,
-            matchTime: null,
-            timestamp: new Date(),
+            matchId:        _id,
+            status:         'Waiting',
+            colorLock:      false,
+            owner:          null,
+            opponent:       null,
+            boardSize:      data.boardSize,
+            undo:           data.undo,
+            chat:           data.chat,
+            spectate:       data.spectate,
+            spectating:     0,
+            stepsQueue:     [],
+            matchWinner:    null,
+            matchTime:      null,
+            totalTime:      null,
+            
+            countDownStartTime: null,
+            matchCreatedTime:   new Date(),
         };
+
+        _match.owner = {
+            userId:     user.userId,
+            username:   user.username,
+            exp:        user.exp,
+            color:      null,
+            matchTime:  null,
+        }
+
         let _result = await this._dbApi.insert(_collection.name, _match);
         console.log(`Match Created: ${_result.result.ok}`);
         return _match;
-    }
-
-    async setFirst(match, username){
-        console.log(`* Setting ${username} to be First...`);
-        match.first = username;
-        await this.updateMatch(match.matchId, match);
-        console.log(`* First Set to ${username}`);
     }
 
     /**
@@ -164,11 +172,22 @@ class GameController {
      * return type: object
      * @param {string} playerName 
      */
-    async getMatchByPlayer(playerName) {
-        console.log(`* Getting Match by player: ${playerName}`);
-        let _result = await this.getMatch({ playerName });
+    async getMatchByOwnerName(ownerName) {
+        console.log(`* Getting Match by Owner username: ${ownerName}`);
+        let _result = await this.getMatch({ "owner.username": ownerName });
         console.log('* Match Get:', _result[0]);
         return (_result.length != 0) ? _result[0] : null;
+    }
+
+    /**
+     * return latest created match from db
+     */
+    async getMatchByTs(order, limit){
+        console.log(`* Getting ${limit} Match(es) in order: ${order}`);
+        let _collection = this._collections.game;
+        let _result = await this._dbApi.orderBy(_collection.name, {}, 'matchCreatedTime', order, limit);
+        console.log(`* Total Match Get: ${_result.length}`);
+        return _result;
     }
 
     /**
@@ -208,6 +227,7 @@ class GameController {
             owner: {
                 username: match.playerName,
                 socket: userSocket,
+                color: null,
             },
             opponent: null,
             specList: [],
