@@ -6,7 +6,9 @@ export {
     createTableRow, getMatchInfo, clearAllRows,
     generateReqBody, generatePOSTReq, sendWSRequest,
     hideDom, showDom, showDomAsGrid, displayMsg,
-    getPlayerLevel, getPlayerRank, isEmpty
+    getPlayerLevel, getPlayerRank, 
+    getTimeRemaining, getTimePassed, setTimer,
+    isEmpty
 };
 
 // general ###################################################################
@@ -248,6 +250,44 @@ function getPlayerRank(playerRankPoints){
 
 function getPlayerWinrate(){
     return (this._user.totalWins / this._user.totalMatches) * 100;
+}
+
+// Time ####################################################################
+
+/**
+ * return time left calculate by given timestamp
+ * @param {number} endTime 
+ */
+function getTimeRemaining(endTime) {
+    const now = new Date();
+    const total = endTime - Date.parse(now);
+    return {
+        total: total,
+        days: Math.floor(total / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((total / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((total / 1000 / 60) % 60),
+        seconds: Math.floor((total / 1000) % 60),
+    };
+}
+
+function getTimePassed(startTime) {
+    const now = new Date();
+    const total = Date.parse(now) - startTime
+    return {
+        total: total,
+        days: Math.floor(total / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((total / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((total / 1000 / 60) % 60),
+        seconds: Math.floor((total / 1000) % 60),
+    };
+}
+
+function setTimer(time, timerDisplay){
+    if(time.minutes < 0 || time.seconds < 0) return;
+    
+    let min = (time.minutes >= 10)? time.minutes: `0${time.minutes}`;
+    let sec = (time.seconds >= 10)? time.seconds: `0${time.seconds}`;
+    timerDisplay.textContent = `${min}:${sec}`;
 }
 
 // Other ####################################################################
