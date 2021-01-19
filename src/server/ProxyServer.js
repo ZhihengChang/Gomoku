@@ -8,19 +8,21 @@ const GameController = require('./GameController');
 
 const PSF = {
     //http
-    login:          login,
-    signup:         signup,
-    createGame:     createGame,
-    loadGameTable:  loadGameTable,
-    joinGame:       joinGame,
-    deleteGame:     deleteGame,
+    login: login,
+    logout: logout,
+    signup: signup,
+    createGame: createGame,
+    loadGameTable: loadGameTable,
+    joinGame: joinGame,
+    deleteGame: deleteGame,
 
-    getUser:        getUser,
+    getUser: getUser,
     getGameOptions: getGameOptions,
-    
+
     //ws
     newRoom: newRoom,
     addPlayerToRoom: addPlayerToRoom,
+    chooseColor: chooseColor,
 }
 
 class ProxyServer {
@@ -118,24 +120,51 @@ async function login(reqBody, response) {
         return;
     }
 
-    // _user.status = 'online';
+    // if(_user.status != 'ingame'){
+    _user.status = 'online';
+    // }
+
     let _loginTime = new Date();
     let _authToken = util.createBase64JWT(config.service.JWT_HEADER, JSON.stringify({
-        id:         _user.userId,
-        username:   _username,
-        ts:         _loginTime.getTime(),
+        id: _user.userId,
+        username: _username,
+        ts: _loginTime.getTime(),
     }), _user.password);
 
     _user.authToken = _authToken;
-    _user.lastLogin = _loginTime;
+    _user.loginTime = _loginTime;
+    _user.logoutTime = null;
 
     await _gameController.updateUser(_user.userId, _user);
 
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', {
-        userId:     _user.userId,
-        username:   _user.username,
-        authToken:  _authToken,
+        userId: _user.userId,
+        username: _user.username,
+        authToken: _authToken,
     });
+}
+
+/**
+ * Handle logout action
+ * update user status to offline when user is not ingame
+ * when user is ingame close game page to log user out
+ * @param {object} reqBody 
+ * @param {object} response 
+ */
+async function logout(reqBody, response) {
+    let _gameController = this;
+    let _userId = reqBody.user.userId;
+    // let _action = reqBody.action;
+
+    let _user = await _gameController.getUserById(_userId);
+
+    _user.logoutTime = new Date();
+    // if(_user.status != 'ingame'){
+    _user.status = 'offline';
+    _user.authToken = null;
+    // }
+
+    _gameController.updateUser(_userId, _user);
 }
 
 /**
@@ -145,24 +174,27 @@ async function login(reqBody, response) {
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function createGame(reqBody, response){
+async function createGame(reqBody, response) {
 
     let _gameController = this;
     let _username = reqBody.user.username;
     let _data = reqBody.data;
     let _action = reqBody.action;
-    
+
     //check duplicate
-    let _duplicateMatch = await _gameController.getMatchByPlayer(_username);
+    let _duplicateMatch = await _gameController.getMatchByOwnerName(_username);
     if (_duplicateMatch) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
-            message: 'Unable to Create Game: error: player already in game.',
+            message: 'Unable to Create Game: error: You Have Already created the Game.',
         });
         return;
     }
 
     let _user = await _gameController.getUserByUsername(_username);
     let _match = await _gameController.createMatch(_user, _data);
+
+    _user.status = 'ingame';
+    await _gameController.updateUser(_user.userId, _user);
 
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
 }
@@ -174,11 +206,11 @@ async function createGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function loadGameTable(reqBody, response){
+async function loadGameTable(reqBody, response) {
     let _gameController = this;
     let _data = reqBody.data; //{}, should be criteria
     let _action = reqBody.action;
-    
+
     let _matches = await _gameController.getMatch();
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _matches);
 }
@@ -189,39 +221,71 @@ async function loadGameTable(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function joinGame(reqBody, response){
+async function joinGame(reqBody, response) {
     let _gameController = this;
-    let _user = reqBody.user;
+    let _userId = reqBody.user.userId;
     let _matchId = reqBody.data.id;
     let _action = reqBody.action;
 
+    let _user = await _gameController.getUserById(_userId);
     let _match = await _gameController.getMatchById(+_matchId);
-    
+
     //check match existence 
-    if(!_match){
+    if (!_match) {
         util.sendJsonResponse(response, _action, 404, 'ERROR', {
             message: 'Unable to Join the Game: error: Game Not Found.',
         });
         return;
     }
-
+    //check match already start
+    if (_match.status == 'In Game') {
+        util.sendJsonResponse(response, _action, 400, 'ERROR', {
+            message: 'Unable to Join the Game: error: Game has Already Started',
+        });
+        return;
+    }
     //check join own game
-    if(_match.playerName == _user.username){
+    if (_match.owner.username == _user.username) {
         util.sendJsonResponse(response, _action, 400, 'ERROR', {
             message: 'Unable to Join the Game: error: Join the Game You Created.',
         });
         return;
     }
-    
+    //check ingame status
+    if (_user.status == 'ingame') {
+        util.sendJsonResponse(response, _action, 400, 'ERROR', {
+            message: 'Unable to Join the Game: error: You are Already In Game.',
+        });
+        return;
+    }
+    //check offline status
+    if (_user.status == 'offline') {
+        util.sendJsonResponse(response, _action, 400, 'ERROR', {
+            message: 'Unable to Join the Game: error: You are Currently Offline. Please Login.',
+        });
+        return;
+    }
+
     //update match
     _match.status = 'In Game';
-    _match.opponent = _user.username;
     _match.timestamp = new Date();
-    let _result = await _gameController.updateMatch(+_matchId, _match);
+    _match.opponent = {
+        userId: _user.userId,
+        username: _user.username,
+        matchTime: _match.matchTime,
+    }
+    if (_match.owner.color) {
+        _match.opponent.color = (_match.owner.color == 'black') ? 'white' : 'black';
+        _match.colorLock = true;
+    }
+
+    await _gameController.updateMatch(+_matchId, _match);
+
+    //update user
+    _user.status = 'ingame';
+    await _gameController.updateUser(_userId, _user);
 
     util.sendJsonResponse(response, _action, 200, 'SUCCESS', _match);
-    // await _gameController.deleteMatch(+_matchId);
-
 }
 
 /**
@@ -229,13 +293,16 @@ async function joinGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function deleteGame(reqBody, response){
+async function deleteGame(reqBody, response) {
     let _gameController = this;
-    let _match = reqBody.data;
-    let _user = reqBody.user;
+    let _matchId = reqBody.data.matchId;
+    let _userId = reqBody.user.userId;
     let _action = reqBody.action;
 
-    await _gameController.deleteMatch(_match.matchId)
+    let _user = await _gameController.getUserById(_userId);
+    _user.status = 'online';
+    await _gameController.updateUser(_userId, _user);
+    await _gameController.deleteMatch(_matchId);
     util.sendJsonResponse(response, _action, 200, 'SUCCESS');
 }
 
@@ -245,12 +312,12 @@ async function deleteGame(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function getUser(reqBody, response){
+async function getUser(reqBody, response) {
     let _gameController = this;
     let _data = reqBody.data;
     let _action = reqBody.action;
-    let _userId = (!util.isEmpty(_data))? _data.userId: reqBody.user.userId;
-    
+    let _userId = (!util.isEmpty(_data)) ? _data.userId : reqBody.user.userId;
+
 
     let _user = await _gameController.getUserById(_userId);
 
@@ -274,13 +341,13 @@ async function getUser(reqBody, response){
  * @param {object} reqBody 
  * @param {object} response 
  */
-async function getGameOptions(reqBody, response){
+async function getGameOptions(reqBody, response) {
     let _gameController = this;
     let _user = reqBody.user;
     let _action = reqBody.action;
 
     let _userOptions = await _gameController.getOptionsByUserId(_user.userId);
-    if(!_userOptions){
+    if (!_userOptions) {
         //use default options
         let _defaultGameOptions = config.options.game;
         util.sendJsonResponse(response, _action, 200, 'SUCCESS', _defaultGameOptions);
@@ -292,7 +359,7 @@ async function getGameOptions(reqBody, response){
 
 //#### websocket functions ######################################################################
 
-async function newRoom(wsRequest, socket){
+async function newRoom(wsRequest, socket) {
     let _gameController = this;
     let _user = wsRequest.user;
     let _data = wsRequest.data;
@@ -306,24 +373,85 @@ async function newRoom(wsRequest, socket){
 
 }
 
-async function addPlayerToRoom(wsRequest, socket){
+async function addPlayerToRoom(wsRequest, socket) {
     let _gameController = this;
     let _user = wsRequest.user;
     let _matchId = wsRequest.data.matchId;
 
     //add to room
     let _match = await _gameController.getMatchById(_matchId);
-    let _isOpponent = (_match.opponent == _user.username)? true: false;
+    let _isOpponent = (_match.opponent.username == _user.username) ? true : false;
     _gameController.addPlayerToRoom(_matchId, _user.username, socket, _isOpponent);
-    
-    //notify owner
+
+
+    let countDownStartTime = new Date();
+    let matchStartCountdown = config.options.game.matchStartCountdown;
+
+    //send response
+    let _message = 'Initiate Match Start Countdown';
     let _room = _gameController.getRoom(_matchId);
-    if(_isOpponent){
-        util.sendWSResponse(_room.owner.socket, 'Opponent Joined');
-    }
-    util.sendWSResponse(socket, 'Room Joined');
-    
+    util.groupSendWSResponse([_room.owner.socket, socket], _message, { 
+        countDownStartTime, matchStartCountdown, match: _match,
+    });
+
+    _message = 'Match Start';
+    setTimeout(async () => {
+        if (!_match.colorLock) {
+            _match.countDownStartTime = countDownStartTime;
+            if (!_room.owner.color) {
+                _match.owner.color = 'black';
+                _match.opponent.color = 'white';
+            } else {
+                let previousColor = _room.owner.color;
+                _room.owner.color = (previousColor == 'black') ? 'white' : 'black';
+                _match.opponent.color = previousColor;
+            }
+            _match.colorLock = true;
+            await _gameController.updateMatch(_matchId, _match);
+        }
+        util.groupSendWSResponse([_room.owner.socket, socket], _message, _match);
+    }, matchStartCountdown * 1000);
+
     //handle send to spec
+}
+
+async function chooseColor(wsRequest, socket) {
+    let _gameController = this;
+    // let _userId = wsRequest.user.userId;
+    let _user = wsRequest.user;
+    let _data = wsRequest.data;
+    let _color = _data.color;
+
+    let _match = await _gameController.getMatchById(_data.matchId);
+
+    //set color
+    if (_match.colorLock) return;
+    
+    if(_user.username == _match.owner.username){
+        _match.owner.color = (_color)? _color: null;
+        if(_match.opponent){
+            _match.opponent.color = (_color == 'black')? 'white': 'black';
+            _match.colorLock = true;
+        }
+    }else{
+        _match.opponent.color = _color;
+        _match.owner.color = (_color == 'black')? 'white': 'black';
+        _match.colorLock = true;
+    }
+
+    await _gameController.updateMatch(_match.matchId, _match);
+    
+    //send color
+    let _message = 'Set Piece Color';
+    let _room = _gameController.getRoom(_match.matchId);
+    if(_match.opponent){
+        let group = [_room.owner.socket, _room.opponent.socket];
+        util.groupSendWSResponse(group, _message, _match);
+    }else{
+        util.sendWSResponse(socket, _message, _match);
+    }
+    
+
 }
 
 
