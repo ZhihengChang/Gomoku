@@ -24,6 +24,7 @@
 
     "options": {
         "game": {
+            "matchStartCountdown": 10,
             "gameBoard": {
                 "size": 14,
                 "edge": 3.5,
