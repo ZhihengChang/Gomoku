@@ -57,3 +57,5 @@ window.onload = function() {
 function clearAllInputs(){
     document.querySelectorAll('.txtbox').forEach( elem => {elem.value = ''});
 }
+
+
