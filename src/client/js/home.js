@@ -23,6 +23,10 @@ window.onload = () => {
 
     menu.btn_profile.addEventListener('click', loadProfilePageHandler);
 
+    menu.btn_friends.addEventListener('click', ()=>{
+        console.log(USER);
+    });
+
     menu.btn_create.addEventListener('click', loadCreateGamePageHandler);
 
     if(localStorage.user) USER = JSON.parse(localStorage.user);
@@ -32,6 +36,8 @@ window.onload = () => {
 }
 
 document.addEventListener("DOMContentLoaded", domContentLoadedHandler);
+// window.addEventListener("beforeunload", pageBeforeUnloadHandler);
+window.addEventListener('beforeunload', pageBeforeUnloadHandler);
 window.addEventListener("unload", pageUnloadHandler);
 window.addEventListener("message", (event) => {
     console.log('recived message: ', event.data);
@@ -147,6 +153,16 @@ function domContentLoadedHandler() {
 }
 
 /**
+ * when user close home page log user out
+ */
+async function pageBeforeUnloadHandler() {
+    let _action = 'logout';
+    let _reqBody = util.generateReqBody(_action, USER);
+    let _request = util.generatePOSTReq(_reqBody);
+    await fetch(`/${_action}`, _request);
+}
+
+/**
  * Clears user's data in session storage
  * NOTE: unload event function
  */
@@ -203,14 +219,6 @@ function actionsHandler(event){
 
 //#### helper functions #########################################################################
 
-/**
- * Default Page: Home
- * Load default page when user successfuly loged in
- */
-function loadDefaultPage() {
-    CUR_PAGE = createPage.home();
-    util.addDom(document.body, CUR_PAGE.div_main);
-}
 
 async function handleJoin(matchInfo){
     WIN_GAME = window.open('about:blank');
@@ -247,6 +255,7 @@ async function loadGameTable(){
 
     let _reqBody = util.generateReqBody(_action, USER, _data);
     let _request = util.generatePOSTReq(_reqBody);
+    // console.log('loadGameTable Request Body:', _reqBody);
     let _res = await fetch(`/${_action}`, _request);
     let _response = await _res.json();
 
@@ -255,8 +264,8 @@ async function loadGameTable(){
         console.log(match);
         let _row = util.createTableRow({
             ID: match.matchId,
-            player: match.playerName,
-            lv: util.getPlayerLevel(match.playerExp),
+            player: match.owner.username,
+            lv: util.getPlayerLevel(match.owner.exp),
             status: match.status,
             undo: match.undo? 'On': 'Off',
             chat: match.chat? 'On': 'Off',
@@ -281,6 +290,7 @@ async function getUserData(userId){
     let _action = 'getUser';
 
     let _reqBody = util.generateReqBody(_action, USER, _data);
+    // console.log('getUserData Request Body:', _reqBody);
     let _request = util.generatePOSTReq(_reqBody);
     let _res = await fetch(`/${_action}`, _request);
     let _response = await _res.json();
