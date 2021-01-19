@@ -71,6 +71,40 @@ class DBApi extends DBInterface{
     }
 
     /**
+     * return ordered selections selected by given query
+     * order is 1 (asc) or -1 (decs)
+     * @param {string} collection 
+     * @param {object} query 
+     * @param {string} by 
+     * @param {number} order 
+     * @param {number} limit 
+     */
+    async orderBy(collection, query, by, order, limit){
+        if(!by){
+            console.log("- DB ERROR: by is not provided");
+            return;
+        }
+
+        let _result;
+        let _findQuery = query || {};
+        let _sortQuery = {};
+        
+        let _order = 1; //default asc
+        let _limit = 50; //default limit 50
+        
+        try{
+            let _collection = this.getDB().collection(collection);
+            if(order) _order = (order >= 0)? 1: -1;
+            if(limit) _limit = (limit >= 0)? limit: -limit;
+            _sortQuery[by] = _order;
+            _result = await _collection.find(_findQuery).sort(_sortQuery).limit(limit).toArray();
+        }catch(err){
+            console.log(err);
+        }
+        return _result;
+    }
+
+    /**
      * Delete one or more records from the specified collection
      * in the current database.
      * If no query provided, delete all.
