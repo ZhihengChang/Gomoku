@@ -308,23 +308,50 @@ function createDisplay_inGame() {
         div_chat: util.createDom('div', { class: 'chat tabcontent container' }),
         
         div_setting: util.createDom('div', { class: 'setting tabcontent container' }),
-        p_timer_name: util.createDom('p', { class: 'timer_name f30', txt: 'Queue Time:' }),
-        p_setting_timer: util.createDom('p', { class: 'setting_timer f30', txt: '00:00' }),
+        //Queue Timer
+        p_timer_name: util.createDom('p', { class: 'timerName f30', txt: 'Queue Time:' }),
+        p_setting_timer: util.createDom('p', { class: 'settingTimer f30', txt: '00:00' }),
 
-        p_black: util.createDom('p', { class: 'p_black', txt: '' }),
+        //Piece Color
+        p_black: util.createDom('p', { class: 'p_black' }),
         inp_checkbox_black: util.createDom('input', { type: 'checkbox', class: 'cbox black' }),
-        p_white: util.createDom('p', { class: 'p_white', txt: '' }),
+        p_white: util.createDom('p', { class: 'p_white' }),
         inp_checkbox_white: util.createDom('input', { type: 'checkbox', class: 'cbox white' }),
 
+        p_match_time: util.createDom('p', { class: 'gameSetting matchTime f20', txt: 'Match Time' }),
+        
+        //Match Time
+        div_timeBar: util.createDom('div', { class: 'timeBar container' }),
+        inp_radio_2min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min2', name: 'matchTime', value: 2 }),
+        inp_radio_5min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min5', name: 'matchTime', value: 5 }),
+        inp_radio_7min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min7', name: 'matchTime', value: 7 }),
+        inp_radio_10min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min10', name: 'matchTime', value: 10 }),
+        inp_radio_15min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min15', name: 'matchTime', value: 15 }),
+        inp_radio_20min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min20', name: 'matchTime', value: 20 }),
+        inp_radio_30min: util.createDom('input', { type: 'radio', class: 'radio', id: 'min30', name: 'matchTime', value: 30 }),
 
+        lbl_2min: util.createDom('label', { class: 'mtime two f13', txt: '2 min', for: 'min2' }),
+        lbl_5min: util.createDom('label', { class: 'mtime five f13', txt: '5 min', for: 'min5' }),
+        lbl_7min: util.createDom('label', { class: 'mtime seven f13', txt: '7 min', for: 'min7' }),
+        lbl_10min: util.createDom('label', { class: 'mtime ten f13', txt: '10 min', for: 'min10' }),
+        lbl_15min: util.createDom('label', { class: 'mtime fifteen f13', txt: '15 min', for: 'min15' }),
+        lbl_20min: util.createDom('label', { class: 'mtime twenty f13', txt: '20 min', for: 'min20' }),
+        lbl_30min: util.createDom('label', { class: 'mtime thirty f13', txt: '30 min', for: 'min30' }),
     };
     util.addDom(game.div_statbar, game.p_state, game.p_countdown, game.p_time);
     util.addDom(game.div_game, game.div_statbar, game.canvas_gameboard);
-
+    util.addDom(game.div_timeBar,
+        game.inp_radio_2min, game.inp_radio_5min, game.inp_radio_7min, game.inp_radio_10min, 
+        game.inp_radio_15min, game.inp_radio_20min, game.inp_radio_30min,
+        game.lbl_2min, game.lbl_5min, game.lbl_7min, game.lbl_10min, game.lbl_15min, game.lbl_20min, game.lbl_30min,
+    );
     util.addDom(game.div_setting, 
-        game.p_timer_name, game.p_setting_timer,
+        game.p_timer_name, 
+        game.p_setting_timer,
         game.inp_checkbox_black, game.inp_checkbox_white,
         game.p_black, game.p_white,
+        game.p_match_time,
+        game.div_timeBar,
     );
 
     util.addDom(game.div_tab_btns, game.btn_chat, game.btn_setting);
