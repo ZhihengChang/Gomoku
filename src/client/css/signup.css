@@ -55,6 +55,7 @@ input:focus {color: white;}
 }
 
 .sbm {
+    transition: 0.3s;
     grid-row-start: 7;
     padding: 0.7em 2.5em 0.7em 2.5em;
 }

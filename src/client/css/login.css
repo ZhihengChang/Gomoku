@@ -61,6 +61,7 @@ input:focus {color: white;}
     grid-row-start: 4;
     grid-column-start: span 8;
     padding: 0.7em 2em 0.7em 2em;
+    transition: 0.3s;
     place-self: center center;
 }
 

@@ -5,6 +5,7 @@
 }
 
 .gtable.container {
+    overflow: scroll;
     background-color: rgb(37, 37, 37);
 }
 
