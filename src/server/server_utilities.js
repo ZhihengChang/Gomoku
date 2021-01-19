@@ -6,7 +6,8 @@ const CryptoJS = require('crypto-js');
 
 module.exports = {
     loadPage, getContentType, 
-    getRequestBody, sendJsonResponse, sendWSResponse,
+    getRequestBody, sendJsonResponse, 
+    sendWSResponse, groupSendWSResponse,
     createBase64JWT,
     isEmpty,
 };
@@ -110,6 +111,18 @@ function sendWSResponse(socket, message, data){
         message: message,
         data: _data,
     }));
+}
+
+/**
+ * send message and data to all sockets in group
+ * @param {array} group 
+ * @param {string} message 
+ * @param {object} data 
+ */
+function groupSendWSResponse(group, message, data){
+    group.forEach(client => {
+        sendWSResponse(client, message, data);
+    });
 }
 
 //#### other functions ##########################################################################
